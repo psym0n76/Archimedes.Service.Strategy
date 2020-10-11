@@ -1,3 +1,4 @@
+using Archimedes.Library.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ namespace Archimedes.Service.Strategy
         {
             services.AddLogging();
             services.AddControllers();
+            services.Configure<Config>(Configuration.GetSection("AppSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
