@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archimedes.Service.Strategy", "Archimedes.Service.Strategy\Archimedes.Service.Strategy.csproj", "{D1A066D3-28F6-4C54-8F4E-BAC90AAC053E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archimedes.Service.Strategy.Tests", "Archimedes.Service.Strategy.Tests\Archimedes.Service.Strategy.Tests.csproj", "{BD883073-9105-42AC-B3EA-1E6B225A94CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1A066D3-28F6-4C54-8F4E-BAC90AAC053E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1A066D3-28F6-4C54-8F4E-BAC90AAC053E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1A066D3-28F6-4C54-8F4E-BAC90AAC053E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1A066D3-28F6-4C54-8F4E-BAC90AAC053E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD883073-9105-42AC-B3EA-1E6B225A94CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD883073-9105-42AC-B3EA-1E6B225A94CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD883073-9105-42AC-B3EA-1E6B225A94CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD883073-9105-42AC-B3EA-1E6B225A94CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7A4BAF34-D574-4E5D-93BD-086FAE6AA613}
+	EndGlobalSection
+EndGlobal
