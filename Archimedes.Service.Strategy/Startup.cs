@@ -34,7 +34,6 @@ namespace Archimedes.Service.Strategy
                 app.UseDeveloperExceptionPage();
             }
 
-
             app.UseHttpsRedirection();
 
             app.UseRouting();

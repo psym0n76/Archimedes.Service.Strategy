@@ -1,16 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Archimedes.Library.Candles;
-using Archimedes.Library.Domain;
 using Archimedes.Library.Message.Dto;
 using Archimedes.Service.Ui.Http;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 using Moq;
-using NuGet.Frameworks;
 using NUnit.Framework;
 
 namespace Archimedes.Service.Strategy.Tests
@@ -29,33 +24,53 @@ namespace Archimedes.Service.Strategy.Tests
         }
 
         [Test]
-        public async Task Should_add_fifteen_candles_to_history_collection()
+        public async Task Should_add_thirty_candles_to_history_collection()
         {
             var subject = GetSubjectUnderTest();
             var result = await subject.Load("GBP/USD", "15Min", 15);
 
             var historyCount = result
-                .SelectMany(a => a.HistoryCandles).Count(a => a.TimeStamp == new DateTime(2020, 10, 08, 01, 30, 00));
+                .SelectMany(a => a.HistoryCandles).Count(a => a.TimeStamp == new DateTime(2020, 10, 08, 01, 45, 00));
 
-            Assert.AreEqual(15, historyCount);
+            Assert.AreEqual(30, historyCount);
         }
 
         [Test]
-        public async Task Should_add_fifteen_candles_with_the_first_Candle_startdate_one_interval_behind()
+        public async Task Should_add_current_candle_to_history()
+        {
+            var subject = GetSubjectUnderTest();
+            var candles = await subject.Load("GBP/USD", "15Min", 15);
+
+            const string currentFromDate = "2020-10-08T01:45:00";
+            const string currentToDate = "2020-10-08T02:00:00";
+
+            var historyCollection = new List<Candle>();
+
+            foreach (var candle in candles.Where(h => h.TimeStamp == new DateTime(2020, 10, 08, 01, 45, 00)))
+            {
+                historyCollection.AddRange(candle.HistoryCandles);
+            }
+
+            Assert.IsTrue(historyCollection.Any(a => a.TimeStamp == DateTime.Parse(currentFromDate)));
+            Assert.IsTrue(historyCollection.Any(a => a.TimeStamp == DateTime.Parse(currentToDate)));
+        }
+
+        [Test]
+        public async Task Should_add_thirty_candles_with_max_and_min_candles()
         {
             var subject = GetSubjectUnderTest();
             var result = await subject.Load("GBP/USD", "15Min", 15);
 
 
-            var history = result.Where(a => a.TimeStamp == new DateTime(2020, 10, 08, 01, 30, 00));
+            var history = result.Where(a => a.TimeStamp == new DateTime(2020, 10, 08, 01, 45, 00));
 
 
-            var maxDate = history.Select(a => a.HistoryCandles.Select(a =>  a.TimeStamp).Max()).FirstOrDefault();
-            var minDate = history.Select(a => a.HistoryCandles.Select(a => a.TimeStamp).Min()).FirstOrDefault();
+            var maxDate = history.Select(a => a.HistoryCandles.Select(b =>  b.TimeStamp).Max()).FirstOrDefault();
+            var minDate = history.Select(a => a.HistoryCandles.Select(b => b.TimeStamp).Min()).FirstOrDefault();
 
 
             Assert.AreEqual(new DateTime(2020, 10, 07, 22, 15, 00), minDate);
-            Assert.AreEqual(new DateTime(2020, 10, 08, 01, 15, 00), maxDate);
+            Assert.AreEqual(new DateTime(2020, 10, 08, 05, 30, 00), maxDate);
         }
 
 

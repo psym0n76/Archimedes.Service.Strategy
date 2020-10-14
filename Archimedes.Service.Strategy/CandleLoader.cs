@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Archimedes.Library.Candles;
-using Archimedes.Library.Enums;
 using Archimedes.Library.Extensions;
 using Archimedes.Service.Ui.Http;
-using Microsoft.VisualBasic;
 
 namespace Archimedes.Service.Strategy
 {
@@ -35,8 +32,7 @@ namespace Archimedes.Service.Strategy
                     dto.Market, dto.Granularity, dto.ToDate);
 
                 var historyCandles = candleDto.Where(a =>
-                    a.ToDate <= dto.ToDate.AddMinutes(interval * 15) && a.FromDate >= dto.FromDate.AddMinutes(-interval * 15));
-
+                    a.FromDate >= dto.FromDate.AddMinutes(-interval * 15) &&  a.FromDate <= dto.FromDate.AddMinutes(interval * 15));
 
                 candle.HistoryCandles = new List<Candle>();
 
