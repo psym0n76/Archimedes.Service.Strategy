@@ -1,4 +1,5 @@
 using Archimedes.Library.Domain;
+using Archimedes.Service.Ui.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,7 @@ namespace Archimedes.Service.Strategy
         {
             services.AddLogging();
             services.AddControllers();
+            services.AddHttpClient<IHttpRepositoryClient>();
             services.Configure<Config>(Configuration.GetSection("AppSettings"));
         }
 

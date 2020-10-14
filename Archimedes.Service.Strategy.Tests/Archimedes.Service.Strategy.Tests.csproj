@@ -4,14 +4,28 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archimedes.Library" Version="1.0.166" />
-    <PackageReference Include="Moq" Version="4.14.6" />
+    <None Remove="GBPUSD_15Min_202010072200_202010082200.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="GBPUSD_15Min_202010072200_202010082200.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Archimedes.Library" Version="1.0.186" />
+    <PackageReference Include="Moq" Version="4.14.7" />
     <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Archimedes.Service.Strategy\Archimedes.Service.Strategy.csproj" />
   </ItemGroup>
 
 </Project>
