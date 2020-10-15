@@ -8,7 +8,7 @@ namespace Archimedes.Service.Ui.Http
 {
     public interface IHttpRepositoryClient
     {
-        Task<IEnumerable<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity);
-        Task<IEnumerable<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity, DateTime startDate, DateTime endDate);
+        Task<List<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity);
+        Task<List<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity, DateTime startDate, DateTime endDate);
     }
 }

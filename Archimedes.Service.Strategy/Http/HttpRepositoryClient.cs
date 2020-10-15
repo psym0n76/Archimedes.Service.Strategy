@@ -25,7 +25,7 @@ namespace Archimedes.Service.Ui.Http
             _logger = logger;
         }
 
-        public async Task<IEnumerable<CandleDto>> GetCandles()
+        public async Task<List<CandleDto>> GetCandles()
         {
             var response = await _client.GetAsync("candle");
 
@@ -40,7 +40,7 @@ namespace Archimedes.Service.Ui.Http
             return candles.ToList();
         }
 
-        public async Task<IEnumerable<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity)
+        public async Task<List<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity)
         {
             var response = await _client.GetAsync($"candle/bymarket_bygranularity?market={market}&granularity={granularity}");
 
@@ -55,7 +55,7 @@ namespace Archimedes.Service.Ui.Http
             return candles.ToList();
         }
 
-        public async Task<IEnumerable<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity, DateTime startDate, DateTime endDate)
+        public async Task<List<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity, DateTime startDate, DateTime endDate)
         {
             var response = await _client.GetAsync($"candle/bymarket_bygranularity_fromdate_todate?market={market}&granularity={granularity}&fromdate{startDate}&todate{endDate}");
 
