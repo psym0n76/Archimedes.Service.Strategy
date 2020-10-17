@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,33 +26,41 @@ namespace Archimedes.Service.Strategy
         {
             var candlesByGranularityMarket = await _client.GetCandlesByGranularityMarket(market, granularity);
 
-            var candles = new List<Candle>();
+            var candles = new ConcurrentBag<Candle>();
             var elapsedTime = new Stopwatch();
+            var result = new List<Candle>();
             elapsedTime.Start();
 
-            foreach (var currentCandle in candlesByGranularityMarket)
-            {
-                var candle = LoadCandle(currentCandle);
-
-                var taskFutureCandles = Task.Run(() =>
-                {
-                    candle.FutureCandles.AddRange(GetCandles(candlesByGranularityMarket, currentCandle, interval));
-                });
-
-                var taskPastCandles = Task.Run(() =>
-                {
-                    candle.PastCandles.AddRange(GetCandles(candlesByGranularityMarket, currentCandle, -interval)
-                        .OrderByDescending(a => a.TimeStamp));
-                });
-
-                Task.WaitAll(taskPastCandles, taskFutureCandles);
-
-                candles.Add(candle);
-            }
+            Parallel.ForEach(candlesByGranularityMarket,
+                currentCandle => { Process(interval, currentCandle, candlesByGranularityMarket, candles); });
 
             _logger.LogInformation(
                 $"Candles loaded: {candlesByGranularityMarket.Count} in {elapsedTime.Elapsed.TotalSeconds} secs");
-            return candles;
+
+            // convert ConcurrentBag to a List to force ordering
+            result.AddRange(candles.OrderBy(a=>a.TimeStamp));
+
+            return result;
+        }
+        
+        private static void Process(int interval, CandleDto currentCandle, List<CandleDto> candlesByGranularityMarket, ConcurrentBag<Candle> candles)
+        {
+            var candle = LoadCandle(currentCandle);
+
+            var taskFutureCandles = Task.Run(() =>
+            {
+                candle.FutureCandles.AddRange(GetCandles(candlesByGranularityMarket, currentCandle, interval));
+            });
+
+            var taskPastCandles = Task.Run(() =>
+            {
+                candle.PastCandles.AddRange(GetCandles(candlesByGranularityMarket, currentCandle, -interval)
+                    .OrderByDescending(a => a.TimeStamp));
+            });
+
+            Task.WaitAll(taskPastCandles, taskFutureCandles);
+
+            candles.Add(candle);
         }
 
         private static Candle LoadCandle(CandleDto dto)
@@ -61,7 +70,7 @@ namespace Archimedes.Service.Strategy
                 new High(dto.BidHigh.ToDecimal(), dto.AskHigh.ToDecimal()),
                 new Low(dto.BidLow.ToDecimal(), dto.AskLow.ToDecimal()),
                 new Close(dto.BidClose.ToDecimal(), dto.AskClose.ToDecimal()),
-                dto.Market, dto.Granularity, dto.ToDate);
+                dto.Market, dto.Granularity, dto.TimeStamp);
             return candle;
         }
 
@@ -72,6 +81,7 @@ namespace Archimedes.Service.Strategy
 
             if (interval > 0)
             {
+                //forward in time
                 historyCandles = candleHistory.Where(a =>
                     a.FromDate > currentCandle.FromDate &&
                     a.FromDate <= currentCandle.FromDate.AddMinutes(interval * 15)).ToList();
@@ -89,8 +99,8 @@ namespace Archimedes.Service.Strategy
                     new Open(hist.BidOpen.ToDecimal(), hist.AskOpen.ToDecimal()),
                     new High(hist.BidHigh.ToDecimal(), hist.AskHigh.ToDecimal()),
                     new Low(hist.BidLow.ToDecimal(), hist.AskLow.ToDecimal()),
-                    new Close(hist.BidClose.ToDecimal(), hist.AskClose.ToDecimal()), hist.Market, hist.Granularity,
-                    hist.ToDate)).ToList();
+                    new Close(hist.BidClose.ToDecimal(), hist.AskClose.ToDecimal()), 
+                    hist.Market, hist.Granularity, hist.TimeStamp)).ToList();
         }
     }
 }

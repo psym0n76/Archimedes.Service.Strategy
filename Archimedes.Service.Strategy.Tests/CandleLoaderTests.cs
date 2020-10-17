@@ -1,19 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Message.Dto;
 using Archimedes.Service.Ui.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NLog;
 using NUnit.Framework;
 
 namespace Archimedes.Service.Strategy.Tests
 {
     public class CandleLoaderTests
     {
+        
+        [Test]
+        public async Task Should_LoadCandle_And_First_TimeStamp_Should_Match()
+        {
+            var subject = GetSubjectUnderTest();
+
+            var result = await subject.Load("GBP/USD", "15Min", 15);
+
+            Assert.AreEqual(new DateTime(2020, 10, 07, 22, 00, 00), result.Take(1).Select(a => a.TimeStamp).Single());
+        }
+
 
         [Test]
         public async Task Should_LoadCandle()
@@ -23,6 +35,48 @@ namespace Archimedes.Service.Strategy.Tests
             var result = await subject.Load("GBP/USD", "15Min", 15);
 
             Assert.AreEqual(97,result.Count);
+        }
+
+        [Test]
+        public async Task Performance_Should_Load_15Min_Candle_For_OneDay_In_LessThan_25_Milliseconds()
+        {
+            //average loads 98 rows in 21ms
+            // in reality this is 8 - 10ms
+
+            var subject = GetSubjectUnderTest();
+
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            var result = await subject.Load("GBP/USD", "15Min", 15);
+            
+            Assert.AreEqual(97,result.Count);
+
+            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 25);
+            TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
+        }
+
+        [Test]
+        public async Task Performance_Should_Load_15Min_Candle_For_OneDay_OneHundredTimes()
+        {
+            //average loads 98 rows in 21ms
+            //average 600 for 9800ms
+            //average 5544 for 98000ms
+
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            var counter = 0;
+            var subject = GetSubjectUnderTest();
+
+            for (var i = 1; i < 100; i++)
+            {
+                var result = await subject.Load("GBP/USD", "15Min", 15);
+                counter = result.Count;
+            }
+            
+            Assert.AreEqual(97,counter);
+
+            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 750);
+            TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
         }
 
         [Test]
@@ -147,8 +201,6 @@ namespace Archimedes.Service.Strategy.Tests
             mockRep.Setup(a => a.GetCandlesByGranularityMarket(It.IsAny<string>(), It.IsAny<string >())).ReturnsAsync(candleDto);
 
             var mockLogger = new Mock<ILogger<CandleLoader>>();
-
-            //_testData = new CandleLoader(mockRep.Object);
 
             return new CandleLoader(mockRep.Object, mockLogger.Object);
         }

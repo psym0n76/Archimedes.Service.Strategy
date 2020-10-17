@@ -36,11 +36,9 @@ namespace Archimedes.Service.Strategy
                 var pastPivotLow = PivotLow(candle, candle.PastCandles.Take(pivotCount));
                 var futurePivotLow = PivotLow(candle, candle.FutureCandles.Take(pivotCount));
 
-                if (pastPivotLow && futurePivotLow)
-                {
-                    _logger.LogInformation($"PivotHigh Low found: {candle}");
-                    priceLevels.Add(candle);
-                }
+                if (!pastPivotLow || !futurePivotLow) continue;
+                _logger.LogInformation($"PivotHigh Low found: {candle}");
+                priceLevels.Add(candle);
             }
 
             return priceLevels;
@@ -70,7 +68,7 @@ namespace Archimedes.Service.Strategy
             var pivot = false;
             foreach (var candleHistoryCandle in history)
             {
-                if (candle.High.Bid > candleHistoryCandle.High.Bid)
+                if (candle.High.Bid >= candleHistoryCandle.High.Bid)
                 {
                     pivot = true;
                 }
@@ -89,7 +87,7 @@ namespace Archimedes.Service.Strategy
             var pivot = false;
             foreach (var candleHistoryCandle in history)
             {
-                if (candle.Low.Bid < candleHistoryCandle.Low.Bid)
+                if (candle.Low.Bid <= candleHistoryCandle.Low.Bid)
                 {
                     pivot = true;
                 }
