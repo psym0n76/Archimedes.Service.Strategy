@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Archimedes.Service.Strategy
 {
-    public class PriceLevelStrategy
+    public class PriceLevelStrategyCloseOpen
     {
-        private readonly ILogger<PriceLevelStrategy> _logger;
+        private readonly ILogger<PriceLevelStrategyCloseOpen> _logger;
 
-        public PriceLevelStrategy(ILogger<PriceLevelStrategy> logger)
+        public PriceLevelStrategyCloseOpen(ILogger<PriceLevelStrategyCloseOpen> logger)
         {
             _logger = logger;
         }
@@ -68,7 +68,7 @@ namespace Archimedes.Service.Strategy
             var pivot = false;
             foreach (var candleHistoryCandle in history)
             {
-                if (candle.High.Bid >= candleHistoryCandle.High.Bid)
+                if (candle.Top().Bid <= candleHistoryCandle.Top().Bid)
                 {
                     pivot = true;
                 }
@@ -87,7 +87,7 @@ namespace Archimedes.Service.Strategy
             var pivot = false;
             foreach (var candleHistoryCandle in history)
             {
-                if (candle.Low.Bid <= candleHistoryCandle.Low.Bid)
+                if (candle.Bottom().Bid <= candleHistoryCandle.Bottom().Bid)
                 {
                     pivot = true;
                 }

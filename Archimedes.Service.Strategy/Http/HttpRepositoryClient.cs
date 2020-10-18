@@ -16,7 +16,6 @@ namespace Archimedes.Service.Ui.Http
         private readonly ILogger<HttpRepositoryClient> _logger;
         private readonly HttpClient _client;
 
-
         public HttpRepositoryClient(IOptions<Config> config, HttpClient httpClient, ILogger<HttpRepositoryClient> logger)
         {
             httpClient.BaseAddress = new Uri($"{config.Value.ApiRepositoryUrl}");
@@ -68,6 +67,27 @@ namespace Archimedes.Service.Ui.Http
             var candles = await response.Content.ReadAsAsync<IEnumerable<CandleDto>>();
 
             return candles.ToList();
+        }
+
+        public void AddPriceLevel(List<PriceLevelDto> priceLevel)
+        {
+            try
+            {
+                var payload = new JsonContent(priceLevel);
+                var response =  _client.PostAsync("price-level", payload).Result; 
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Failed to Post {response.ReasonPhrase} from {_client.BaseAddress}price-level");
+                }
+
+                _logger.LogInformation(
+                    $"\n\n ADDED {priceLevel} Price Levels\n");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error {e.Message} {e.StackTrace}");
+            }
         }
     }
 }
