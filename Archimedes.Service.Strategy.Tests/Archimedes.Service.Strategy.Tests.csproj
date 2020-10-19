@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archimedes.Library" Version="1.0.206" />
+    <PackageReference Include="Archimedes.Library" Version="1.0.207" />
     <PackageReference Include="Moq" Version="4.14.7" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />

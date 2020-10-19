@@ -16,7 +16,8 @@ namespace Archimedes.Service.Strategy
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
 
-        public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader, IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client)
+        public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader,
+            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client)
         {
             _logger = logger;
             _consumer = consumer;
@@ -43,7 +44,7 @@ namespace Archimedes.Service.Strategy
         {
             try
             {
-                var candles = await _loader.Load(message.Market,message.Granularity,message.Interval);
+                var candles = await _loader.Load(message.Market, message.Granularity, message.Interval);
                 var levels = _priceLevelStrategy.Calculate(candles, 7);
 
                 _client.AddPriceLevel(levels);
