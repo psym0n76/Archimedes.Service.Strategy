@@ -40,19 +40,26 @@ namespace Archimedes.Service.Strategy
                 var futurePivotLow = PivotLow(candle, candle.FutureCandles.Take(pivotCount));
 
                 if (!pastPivotLow || !futurePivotLow) continue;
-                _logger.LogInformation($"PivotHigh Low found: {candle}");
+                _logger.LogInformation($"PivotLow found: {candle}");
 
                 var p = new PriceLevelDto()
                 {
                     TimeStamp = candle.TimeStamp,
                     Granularity = candle.TimeFrame,
                     Market = candle.Market,
-                    LastUpdated = DateTime.Now,
+                    Active = "True",
+
                     AskPrice = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
+                    AskPriceRange = double.Parse(candle.Top().Ask.ToString(CultureInfo.InvariantCulture)),
+
                     BidPrice = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
+                    BidPriceRange = double.Parse(candle.Top().Bid.ToString(CultureInfo.InvariantCulture)),
+
                     Strategy = "PIVOT LOW " + pivotCount,
                     TradeType = "BUY",
-                    
+                    CandleType = "convertenumtostring",
+                    LastUpdated = DateTime.Now,
+
                 };
                 priceLevels.Add(p);
             }
@@ -71,18 +78,24 @@ namespace Archimedes.Service.Strategy
 
                 if (pastPivotHigh && futurePivotHigh)
                 {
-                    _logger.LogInformation($"PivotHigh High found: {candle}");
+                    _logger.LogInformation($"PivotHigh found: {candle}");
 
                     var p = new PriceLevelDto()
                     {
                         TimeStamp = candle.TimeStamp,
                         Granularity = candle.TimeFrame,
                         Market = candle.Market,
-                        LastUpdated = DateTime.Now,
+
                         AskPrice = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
+                        AskPriceRange = double.Parse(candle.Bottom().Ask.ToString(CultureInfo.InvariantCulture)),
+
                         BidPrice = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
+                        BidPriceRange = double.Parse(candle.Bottom().Bid.ToString(CultureInfo.InvariantCulture)),
+
                         Strategy = "PIVOT HIGH " + pivotCount,
                         TradeType = "SELL",
+                        CandleType = "convertenumtostring",
+                        LastUpdated = DateTime.Now
                     };
 
                     priceLevels.Add(p);
