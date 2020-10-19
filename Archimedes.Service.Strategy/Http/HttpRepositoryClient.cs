@@ -9,7 +9,7 @@ using Archimedes.Library.Message.Dto;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Archimedes.Service.Ui.Http
+namespace Archimedes.Service.Strategy.Http
 {
     public class HttpRepositoryClient : IHttpRepositoryClient
     { 

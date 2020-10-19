@@ -2,7 +2,7 @@
 using System.Threading;
 using Archimedes.Library.Message;
 using Archimedes.Library.RabbitMq;
-using Archimedes.Service.Ui.Http;
+using Archimedes.Service.Strategy.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

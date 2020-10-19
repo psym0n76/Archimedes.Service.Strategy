@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Archimedes.Library.Message.Dto;
-using Microsoft.VisualBasic;
 
-namespace Archimedes.Service.Ui.Http
+namespace Archimedes.Service.Strategy.Http
 {
     public interface IHttpRepositoryClient
     {

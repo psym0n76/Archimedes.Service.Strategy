@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-namespace Archimedes.Api.Repository.Controllers
+namespace Archimedes.Service.Strategy.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

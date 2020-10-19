@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Extensions;
 using Archimedes.Library.Message.Dto;
-using Archimedes.Service.Ui.Http;
+using Archimedes.Service.Strategy.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Archimedes.Service.Strategy

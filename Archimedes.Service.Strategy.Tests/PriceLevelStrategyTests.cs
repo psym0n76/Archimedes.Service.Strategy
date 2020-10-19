@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Message.Dto;
-using Archimedes.Service.Ui.Http;
+using Archimedes.Service.Strategy.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;

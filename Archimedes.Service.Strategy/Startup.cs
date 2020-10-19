@@ -1,6 +1,6 @@
 using Archimedes.Library.Domain;
 using Archimedes.Library.RabbitMq;
-using Archimedes.Service.Ui.Http;
+using Archimedes.Service.Strategy.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
