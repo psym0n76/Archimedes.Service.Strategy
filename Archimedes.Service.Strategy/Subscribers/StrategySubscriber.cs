@@ -11,12 +11,12 @@ namespace Archimedes.Service.Strategy
     public class StrategySubscriber : IStrategySubscriber
     {
         private readonly ILogger<StrategySubscriber> _logger;
-        private readonly ICandleConsumer _consumer;
+        private readonly IStrategyConsumer _consumer;
         private readonly ICandleLoader _loader;
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
 
-        public StrategySubscriber(ILogger<StrategySubscriber> logger, ICandleConsumer consumer, ICandleLoader loader, IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client)
+        public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader, IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client)
         {
             _logger = logger;
             _consumer = consumer;

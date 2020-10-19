@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Archimedes.Service.Strategy
 {
-    public class PriceLevelStrategy
+    public class PriceLevelStrategy : IPriceLevelStrategy
     {
         private readonly ILogger<PriceLevelStrategy> _logger;
 
