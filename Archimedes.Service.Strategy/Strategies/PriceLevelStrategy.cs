@@ -57,7 +57,7 @@ namespace Archimedes.Service.Strategy
 
                     Strategy = "PIVOT LOW " + pivotCount,
                     TradeType = "BUY",
-                    CandleType = "convertenumtostring",
+                    CandleType = "DOJI",
                     LastUpdated = DateTime.Now,
 
                 };
@@ -94,7 +94,7 @@ namespace Archimedes.Service.Strategy
 
                         Strategy = "PIVOT HIGH " + pivotCount,
                         TradeType = "SELL",
-                        CandleType = "convertenumtostring",
+                        CandleType = "DOJI",
                         LastUpdated = DateTime.Now
                     };
 
