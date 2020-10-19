@@ -52,6 +52,7 @@ namespace Archimedes.Service.Strategy
                     BidPrice = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
                     Strategy = "PIVOT LOW " + pivotCount,
                     TradeType = "BUY",
+                    
                 };
                 priceLevels.Add(p);
             }
