@@ -49,9 +49,11 @@ namespace Archimedes.Service.Strategy
 
                 foreach (var strategy in strategies)
                 {
-                    var levels = _priceLevelStrategy.Calculate(candles, 7);
-
-                    _client.AddPriceLevel(levels); 
+                    if (strategy.Active)
+                    {
+                        var levels = _priceLevelStrategy.Calculate(candles, 7);
+                        _client.AddPriceLevel(levels);
+                    }
                 }
             }
             catch (Exception e)
