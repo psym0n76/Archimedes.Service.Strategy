@@ -88,10 +88,12 @@ namespace Archimedes.Service.Strategy
 
                         AskPrice = double.Parse(candle.Top().Ask.ToString(CultureInfo.InvariantCulture)),
                         AskPriceRange =  double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
-                        
+                       
+
                         BidPrice = double.Parse(candle.Top().Bid.ToString(CultureInfo.InvariantCulture)),
                         BidPriceRange =   double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
-                        
+                      
+
                         Strategy = "PIVOT HIGH " + pivotCount,
                         TradeType = "SELL",
                         CandleType = candle.BodyFillRate().ToString(CultureInfo.InvariantCulture),
