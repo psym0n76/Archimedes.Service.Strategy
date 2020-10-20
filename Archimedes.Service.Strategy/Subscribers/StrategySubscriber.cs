@@ -51,8 +51,9 @@ namespace Archimedes.Service.Strategy
                 {
                     if (strategy.Active)
                     {
-                        var levels = _priceLevelStrategy.Calculate(candles, 7);
+                        var levels = _priceLevelStrategy.Calculate(candles, 7); // pass in startDate
                         _client.AddPriceLevel(levels);
+                        //_client.UpdateStrategyMetrics // update start date
                     }
                 }
             }
