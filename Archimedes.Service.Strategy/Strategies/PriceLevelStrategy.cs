@@ -49,15 +49,15 @@ namespace Archimedes.Service.Strategy
                     Market = candle.Market,
                     Active = "True",
 
-                    AskPrice = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
-                    AskPriceRange = double.Parse(candle.Top().Ask.ToString(CultureInfo.InvariantCulture)),
+                    AskPrice = double.Parse(candle.Bottom().Ask.ToString(CultureInfo.InvariantCulture)),
+                    AskPriceRange = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
 
-                    BidPrice = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
-                    BidPriceRange = double.Parse(candle.Top().Bid.ToString(CultureInfo.InvariantCulture)),
+                    BidPrice = double.Parse(candle.Bottom().Bid.ToString(CultureInfo.InvariantCulture)),
+                    BidPriceRange = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
 
                     Strategy = "PIVOT LOW " + pivotCount,
                     TradeType = "BUY",
-                    CandleType = "DOJI",
+                    CandleType = candle.BodyFillRate().ToString(CultureInfo.InvariantCulture),
                     LastUpdated = DateTime.Now,
 
                 };
@@ -86,15 +86,15 @@ namespace Archimedes.Service.Strategy
                         Granularity = candle.TimeFrame,
                         Market = candle.Market,
 
-                        AskPrice = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
-                        AskPriceRange = double.Parse(candle.Bottom().Ask.ToString(CultureInfo.InvariantCulture)),
-
-                        BidPrice = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
-                        BidPriceRange = double.Parse(candle.Bottom().Bid.ToString(CultureInfo.InvariantCulture)),
-
+                        AskPrice = double.Parse(candle.Top().Ask.ToString(CultureInfo.InvariantCulture)),
+                        AskPriceRange =  double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
+                        
+                        BidPrice = double.Parse(candle.Top().Bid.ToString(CultureInfo.InvariantCulture)),
+                        BidPriceRange =   double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
+                        
                         Strategy = "PIVOT HIGH " + pivotCount,
                         TradeType = "SELL",
-                        CandleType = "DOJI",
+                        CandleType = candle.BodyFillRate().ToString(CultureInfo.InvariantCulture),
                         LastUpdated = DateTime.Now
                     };
 
