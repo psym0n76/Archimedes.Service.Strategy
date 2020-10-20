@@ -39,6 +39,21 @@ namespace Archimedes.Service.Strategy.Http
             return candles.ToList();
         }
 
+        public async Task<List<StrategyDto>> GetStrategiesByGranularityMarket(string market, string granularity)
+        {
+            var response = await _client.GetAsync($"strategy/bymarket_bygranularity?market={market}&granularity={granularity}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"GET Failed: {response.ReasonPhrase} from {response.RequestMessage.RequestUri}");
+                return null;
+            }
+
+            var strategies = await response.Content.ReadAsAsync<IEnumerable<StrategyDto>>();
+
+            return strategies.ToList();
+        }
+
         public async Task<List<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity)
         {
             var response = await _client.GetAsync($"candle/bymarket_bygranularity?market={market}&granularity={granularity}");

@@ -44,10 +44,15 @@ namespace Archimedes.Service.Strategy
         {
             try
             {
+                var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
                 var candles = await _loader.Load(message.Market, message.Granularity, message.Interval);
-                var levels = _priceLevelStrategy.Calculate(candles, 7);
 
-                _client.AddPriceLevel(levels);
+                foreach (var strategy in strategies)
+                {
+                    var levels = _priceLevelStrategy.Calculate(candles, 7);
+
+                    _client.AddPriceLevel(levels); 
+                }
             }
             catch (Exception e)
             {
