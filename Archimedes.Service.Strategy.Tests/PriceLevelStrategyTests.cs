@@ -109,11 +109,11 @@ namespace Archimedes.Service.Strategy.Tests
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 7);
 
-            Assert.AreEqual(8,result.Count);
+            Assert.AreEqual(7,result.Count);
         }
 
 
-        [TestCase("2020-10-07T22:45:00")]
+        //[TestCase("2020-10-07T22:45:00")]
         [TestCase("2020-10-08T02:30:00")]
         [TestCase("2020-10-08T05:15:00")]
         [TestCase("2020-10-08T11:45:00")]
@@ -131,7 +131,7 @@ namespace Archimedes.Service.Strategy.Tests
             var subject = GetSubjectUnderTest();
             var result = subject.CalculatePivotLow(_candles, 7).ToList();
 
-            Assert.AreEqual(4,result.Count);
+            Assert.AreEqual(3,result.Count);
         }
 
         [TestCase("2020-10-08T09:15:00")]
@@ -157,7 +157,7 @@ namespace Archimedes.Service.Strategy.Tests
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 5);
 
-            Assert.AreEqual(14,result.Count);
+            Assert.AreEqual(13,result.Count);
         }
 
 
@@ -168,7 +168,7 @@ namespace Archimedes.Service.Strategy.Tests
             var subject = GetSubjectUnderTest();
             var result = subject.CalculatePivotLow(_candles, 5).ToList();
 
-            Assert.AreEqual(7,result.Count);
+            Assert.AreEqual(6,result.Count);
         }
 
 
@@ -182,7 +182,7 @@ namespace Archimedes.Service.Strategy.Tests
         }
 
 
-        [TestCase("2020-10-07T23:45:00")]
+       // [TestCase("2020-10-07T23:45:00")] ignore because not enough history
         [TestCase("2020-10-08T04:00:00")]
         [TestCase("2020-10-08T09:15:00")]
         [TestCase("2020-10-08T09:30:00")]
@@ -198,7 +198,7 @@ namespace Archimedes.Service.Strategy.Tests
         }
 
 
-        [TestCase("2020-10-07T22:45:00")]
+       // [TestCase("2020-10-07T22:45:00")]  ignore because not enough history
         [TestCase("2020-10-08T02:30:00")]
         [TestCase("2020-10-08T05:15:00")]
         [TestCase("2020-10-08T07:15:00")]

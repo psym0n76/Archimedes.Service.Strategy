@@ -36,8 +36,8 @@ namespace Archimedes.Service.Strategy
 
             foreach (var candle in candles)
             {
-                var pastPivotLow = PivotLow(candle, candle.PastCandles.Take(pivotCount));
-                var futurePivotLow = PivotLow(candle, candle.FutureCandles.Take(pivotCount));
+                var pastPivotLow = PivotLow(candle, candle.PastCandles.Take(pivotCount), pivotCount);
+                var futurePivotLow = PivotLow(candle, candle.FutureCandles.Take(pivotCount), pivotCount);
 
                 if (!pastPivotLow || !futurePivotLow) continue;
                 _logger.LogInformation($"PivotLow found: {candle}");
@@ -50,10 +50,10 @@ namespace Archimedes.Service.Strategy
                     Active = "True",
 
                     AskPrice = double.Parse(candle.Bottom().Ask.ToString(CultureInfo.InvariantCulture)),
-                    AskPriceRange = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
+                    AskPriceRange = double.Parse(candle.Low.Ask.ToString(CultureInfo.InvariantCulture)),
 
                     BidPrice = double.Parse(candle.Bottom().Bid.ToString(CultureInfo.InvariantCulture)),
-                    BidPriceRange = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
+                    BidPriceRange = double.Parse(candle.Low.Bid.ToString(CultureInfo.InvariantCulture)),
 
                     Strategy = "PIVOT LOW " + pivotCount,
                     TradeType = "BUY",
@@ -73,8 +73,8 @@ namespace Archimedes.Service.Strategy
 
             foreach (var candle in candles)
             {
-                var pastPivotHigh = PivotHigh(candle, candle.PastCandles.Take(pivotCount));
-                var futurePivotHigh = PivotHigh(candle, candle.FutureCandles.Take(pivotCount));
+                var pastPivotHigh = PivotHigh(candle, candle.PastCandles.Take(pivotCount), pivotCount);
+                var futurePivotHigh = PivotHigh(candle, candle.FutureCandles.Take(pivotCount), pivotCount);
 
                 if (pastPivotHigh && futurePivotHigh)
                 {
@@ -87,12 +87,10 @@ namespace Archimedes.Service.Strategy
                         Market = candle.Market,
 
                         AskPrice = double.Parse(candle.Top().Ask.ToString(CultureInfo.InvariantCulture)),
-                        AskPriceRange =  double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
-                       
+                        AskPriceRange = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
 
                         BidPrice = double.Parse(candle.Top().Bid.ToString(CultureInfo.InvariantCulture)),
-                        BidPriceRange =   double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
-                      
+                        BidPriceRange = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
 
                         Strategy = "PIVOT HIGH " + pivotCount,
                         TradeType = "SELL",
@@ -107,9 +105,15 @@ namespace Archimedes.Service.Strategy
             return priceLevels;
         }
 
-        private static bool PivotHigh(Candle candle, IEnumerable<Candle> history)
+        private static bool PivotHigh(Candle candle, IEnumerable<Candle> history, int pivotCount)
         {
             var pivot = false;
+
+            if (history.Count() < pivotCount)
+            {
+                return false;
+            }
+
             foreach (var candleHistoryCandle in history)
             {
                 if (candle.High.Bid >= candleHistoryCandle.High.Bid)
@@ -126,9 +130,15 @@ namespace Archimedes.Service.Strategy
             return pivot;
         }
 
-        private static bool PivotLow(Candle candle, IEnumerable<Candle> history)
+        private static bool PivotLow(Candle candle, IEnumerable<Candle> history, int pivotCount)
         {
             var pivot = false;
+
+            if (history.Count() < pivotCount)
+            {
+                return false;
+            }
+
             foreach (var candleHistoryCandle in history)
             {
                 if (candle.Low.Bid <= candleHistoryCandle.Low.Bid)
