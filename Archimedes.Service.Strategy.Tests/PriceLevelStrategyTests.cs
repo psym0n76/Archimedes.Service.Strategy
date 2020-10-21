@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Message.Dto;
 using Archimedes.Service.Strategy.Http;
@@ -23,7 +21,7 @@ namespace Archimedes.Service.Strategy.Tests
         }
 
         [Test]
-        public  void Should_Load_Candles_And_CalculatePriceLevel_In_LessThan_100_Milliseconds()
+        public void Should_Load_Candles_And_CalculatePriceLevel_In_LessThan_100_Milliseconds()
         {
             // loading 24hours 15 mins candles - 10ms 
             // loading 24250 hours 15 mins - 100ms
@@ -40,7 +38,7 @@ namespace Archimedes.Service.Strategy.Tests
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             var result = subject.Calculate(largeCandle, 7);
-            
+
             Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 1000000);
             TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
             TestContext.Out.WriteLine($"Levels created: {result.Count}");
@@ -51,7 +49,7 @@ namespace Archimedes.Service.Strategy.Tests
         }
 
         [Test]
-        public  void Should_Load_Candles_And_CalculatePriceLevel_In_LessThan_150_Milliseconds()
+        public void Should_Load_Candles_And_CalculatePriceLevel_In_LessThan_150_Milliseconds()
         {
             // loading 24hours 15 mins candles - 10ms 
             // loading 24250 hours 15 mins - 100ms
@@ -68,7 +66,7 @@ namespace Archimedes.Service.Strategy.Tests
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             var result = subject.Calculate(largeCandle, 7);
-            
+
             Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 150);
             TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
             TestContext.Out.WriteLine($"Levels created: {result.Count}");
@@ -80,7 +78,7 @@ namespace Archimedes.Service.Strategy.Tests
 
 
         [Test]
-        public  void Should_Load_Candles_And_CalculatePriceLevel_In_LessThan_25_Milliseconds()
+        public void Should_Load_Candles_And_CalculatePriceLevel_In_LessThan_25_Milliseconds()
         {
             // loading 24hours 15 mins candles - 10ms 
             var subject = GetSubjectUnderTest();
@@ -88,13 +86,13 @@ namespace Archimedes.Service.Strategy.Tests
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             var result = subject.Calculate(_candles, 7);
-            
+
             Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 20);
             TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
         }
 
         [Test]
-        public  void Should_Load_Candles_And_CalculatePriceLevel_And_Return_Candles()
+        public void Should_Load_Candles_And_CalculatePriceLevel_And_Return_Candles()
         {
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 7);
@@ -109,123 +107,18 @@ namespace Archimedes.Service.Strategy.Tests
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 7);
 
-            Assert.AreEqual(7,result.Count);
+            Assert.AreEqual(7, result.Count);
         }
-
-
-        //[TestCase("2020-10-07T22:45:00")]
-        [TestCase("2020-10-08T02:30:00")]
-        [TestCase("2020-10-08T05:15:00")]
-        [TestCase("2020-10-08T11:45:00")]
-        public  void Should_Calculate_LowPivots_BasedOn_SevenPivotStrategy(DateTime expectedTimestamp)
-        {
-            var subject = GetSubjectUnderTest();
-            var result = subject.CalculatePivotLow(_candles, 7).ToList();
-
-            Assert.IsTrue(result.Any(a => a.TimeStamp == expectedTimestamp));
-        }
-
-        [Test]
-        public  void Should_Calculate_LowPivots_BasedOn_SevenPivotStrategy_And_Return_Four()
-        {
-            var subject = GetSubjectUnderTest();
-            var result = subject.CalculatePivotLow(_candles, 7).ToList();
-
-            Assert.AreEqual(3,result.Count);
-        }
-
-        [TestCase("2020-10-08T09:15:00")]
-        [TestCase("2020-10-08T09:30:00")]
-        [TestCase("2020-10-08T14:45:00")]
-        [TestCase("2020-10-08T17:00:00")]
-        public  void Should_Calculate_HighPivots_BasedOn_SevenPivotStrategy(DateTime expectedTimestamp)
-        {
-            var subject = GetSubjectUnderTest();
-            var result = subject.CalculatePivotHigh(_candles, 7).ToList();
-
-            Assert.IsTrue(result.Any(a => a.TimeStamp == expectedTimestamp));
-        }
-
-
-
-
 
 
         [Test]
-        public  void Should_Load_Candles_And_CalculatePriceLevel_BasedOn_FivePivotStrategy_And_Return_Twelve_Candles()
+        public void Should_Load_Candles_And_CalculatePriceLevel_BasedOn_FivePivotStrategy_And_Return_Twelve_Candles()
         {
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 5);
 
-            Assert.AreEqual(13,result.Count);
+            Assert.AreEqual(13, result.Count);
         }
-
-
-
-        [Test]
-        public  void Should_Calculate_LowPivots_BasedOn_FivePivotStrategy_And_Return_Seven()
-        {
-            var subject = GetSubjectUnderTest();
-            var result = subject.CalculatePivotLow(_candles, 5).ToList();
-
-            Assert.AreEqual(6,result.Count);
-        }
-
-
-        [Test]
-        public  void Should_Calculate_HighPivots_BasedOn_FivePivotStrategy_And_Return_Seven()
-        {
-            var subject = GetSubjectUnderTest();
-            var result = subject.CalculatePivotHigh(_candles, 5).ToList();
-
-            Assert.AreEqual(7,result.Count);
-        }
-
-
-       // [TestCase("2020-10-07T23:45:00")] ignore because not enough history
-        [TestCase("2020-10-08T04:00:00")]
-        [TestCase("2020-10-08T09:15:00")]
-        [TestCase("2020-10-08T09:30:00")]
-        [TestCase("2020-10-08T13:15:00")]
-        [TestCase("2020-10-08T14:45:00")]
-        [TestCase("2020-10-08T17:00:00")]
-        public  void Should_Calculate_HighPivots_BasedOn_FivePivotStrategy(DateTime expectedTimestamp)
-        {
-            var subject = GetSubjectUnderTest();
-            var result = subject.CalculatePivotHigh(_candles, 5).ToList();
-
-            Assert.IsTrue(result.Any(a => a.TimeStamp == expectedTimestamp));
-        }
-
-
-       // [TestCase("2020-10-07T22:45:00")]  ignore because not enough history
-        [TestCase("2020-10-08T02:30:00")]
-        [TestCase("2020-10-08T05:15:00")]
-        [TestCase("2020-10-08T07:15:00")]
-        [TestCase("2020-10-08T09:00:00")]
-        [TestCase("2020-10-08T11:45:00")]
-        [TestCase("2020-10-08T20:30:00")] // this is a pivot because we only have 24 hour period
-        public  void Should_Calculate_LowPivots_BasedOn_FivePivotStrategy(DateTime expectedTimestamp)
-        {
-            var subject = GetSubjectUnderTest();
-            var result = subject.CalculatePivotLow(_candles, 5).ToList();
-
-            Assert.IsTrue(result.Any(a => a.TimeStamp == expectedTimestamp));
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         private async void LoadMockCandles()
         {
@@ -238,7 +131,8 @@ namespace Archimedes.Service.Strategy.Tests
             var candleDto = data.Reader<CandleDto>("GBPUSD_15Min_202010072200_202010082200");
 
             var mockRep = new Mock<IHttpRepositoryClient>();
-            mockRep.Setup(a => a.GetCandlesByGranularityMarket(It.IsAny<string>(), It.IsAny<string >())).ReturnsAsync(candleDto);
+            mockRep.Setup(a => a.GetCandlesByGranularityMarket(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(candleDto);
 
             var mockLogger = new Mock<ILogger<CandleLoader>>();
 
@@ -249,7 +143,13 @@ namespace Archimedes.Service.Strategy.Tests
         {
             var mockLogger = new Mock<ILogger<PriceLevelStrategy>>();
 
-            return new PriceLevelStrategy(mockLogger.Object);
+            var mockPriceHighLogger = new Mock<ILogger<Strategy.PivotLevelStrategyHigh>>();
+            var mockPriceLowLogger = new Mock<ILogger<PivotLevelStrategyLow>>();
+
+            var mockPriceHigh = new Strategy.PivotLevelStrategyHigh(mockPriceHighLogger.Object);
+            var mockPriceLow = new PivotLevelStrategyLow(mockPriceLowLogger.Object);
+
+            return new PriceLevelStrategy(mockLogger.Object, mockPriceHigh, mockPriceLow);
         }
     }
 }
