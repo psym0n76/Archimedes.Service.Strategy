@@ -35,6 +35,7 @@ namespace Archimedes.Service.Strategy
                     TimeStamp = candle.TimeStamp,
                     Granularity = candle.TimeFrame,
                     Market = candle.Market,
+                    Active = "True",
 
                     AskPrice = double.Parse(candle.Top().Ask.ToString(CultureInfo.InvariantCulture)),
                     AskPriceRange = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
