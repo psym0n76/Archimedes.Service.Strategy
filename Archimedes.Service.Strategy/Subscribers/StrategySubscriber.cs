@@ -61,7 +61,6 @@ namespace Archimedes.Service.Strategy
                             _client.AddPriceLevel(levels);
 
                             strategy.EndDate = levels.Max(a => a.TimeStamp);
-                            strategy.LastUpdated = DateTime.Now;
 
                             _client.UpdateStrategyMetrics(strategy); // update start datefrom  
                         }
