@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Archimedes.Library.Message;
 using Archimedes.Library.RabbitMq;
@@ -51,12 +52,18 @@ namespace Archimedes.Service.Strategy
                 {
                     if (strategy.Active)
                     {
-                        var levels = _priceLevelStrategy.Calculate(candles, 7); // pass in startDate
+                        var levels =
+                            _priceLevelStrategy.Calculate(
+                                candles.Where(a => a.TimeStamp >= strategy.EndDate).ToList(), 7); // pass in startDate
 
-                        if (levels!=null)
+                        if (levels != null)
                         {
                             _client.AddPriceLevel(levels);
-                            //_client.UpdateStrategyMetrics // update start date 
+
+                            strategy.EndDate = levels.Max(a => a.TimeStamp);
+                            strategy.LastUpdated = DateTime.Now;
+
+                            _client.UpdateStrategyMetrics(strategy); // update start datefrom  
                         }
                     }
                 }

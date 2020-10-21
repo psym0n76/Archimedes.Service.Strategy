@@ -39,6 +39,8 @@ namespace Archimedes.Service.Strategy.Http
             return candles.ToList();
         }
 
+
+
         public async Task<List<StrategyDto>> GetStrategiesByGranularityMarket(string market, string granularity)
         {
             var response = await _client.GetAsync($"strategy/bymarket_bygranularity?market={market}&granularity={granularity}");
@@ -89,7 +91,7 @@ namespace Archimedes.Service.Strategy.Http
             try
             {
                 var payload = new JsonContent(priceLevel);
-                var response =  _client.PostAsync("price-level", payload).Result; 
+                var response =  _client.PostAsync("price-level", payload).Result; //post request wait to finish
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -98,6 +100,28 @@ namespace Archimedes.Service.Strategy.Http
 
                 _logger.LogInformation(
                     $"\n\n ADDED {priceLevel} Price Levels\n");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error {e.Message} {e.StackTrace}");
+            }
+        }
+
+        public void UpdateStrategyMetrics(StrategyDto strategy)
+        {
+            try
+            {
+                var payload = new JsonContent(strategy);
+                var response =  _client.PutAsync(
+                    "strategy", payload).Result; //post request wait to finish
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Failed to Post {response.ReasonPhrase} from {_client.BaseAddress}strategy");
+                }
+
+                _logger.LogInformation(
+                    $"\n\n ADDED {strategy}\n");
             }
             catch (Exception e)
             {

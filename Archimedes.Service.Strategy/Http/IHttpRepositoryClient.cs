@@ -11,6 +11,8 @@ namespace Archimedes.Service.Strategy.Http
         Task<List<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity, DateTime startDate, DateTime endDate);
         void AddPriceLevel(List<PriceLevelDto> priceLevel);
 
+        void UpdateStrategyMetrics(StrategyDto strategy);
+
         Task<List<StrategyDto>> GetStrategiesByGranularityMarket(string market, string granularity);
     }
 }
