@@ -107,13 +107,12 @@ namespace Archimedes.Service.Strategy.Http
             }
         }
 
-        public void UpdateStrategyMetrics(StrategyDto strategy)
+        public async void UpdateStrategyMetrics(StrategyDto strategy)
         {
             try
             {
                 var payload = new JsonContent(strategy);
-                var response =  _client.PutAsync(
-                    "strategy", payload).Result; //post request wait to finish
+                var response = await _client.PutAsync("strategy", payload);
 
                 if (!response.IsSuccessStatusCode)
                 {
