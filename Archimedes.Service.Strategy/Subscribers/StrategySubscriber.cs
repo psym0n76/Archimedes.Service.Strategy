@@ -70,7 +70,7 @@ namespace Archimedes.Service.Strategy
                             strategy.Count = levels.Count;
 
                             _client.UpdateStrategyMetrics(strategy);
-                            await _context.Clients.All.SendAsync("update", strategy);
+                            await _context.Clients.All.SendAsync("Update", strategy);
                         }
                     }
                 }
