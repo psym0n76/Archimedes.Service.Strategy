@@ -4,6 +4,8 @@ using System.Threading;
 using Archimedes.Library.Message;
 using Archimedes.Library.RabbitMq;
 using Archimedes.Service.Strategy.Http;
+using Archimedes.Service.Strategy.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -16,15 +18,17 @@ namespace Archimedes.Service.Strategy
         private readonly ICandleLoader _loader;
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
+        private readonly IHubContext<StrategyHub> _context;
 
         public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader,
-            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client)
+            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context)
         {
             _logger = logger;
             _consumer = consumer;
             _loader = loader;
             _priceLevelStrategy = priceLevelStrategy;
             _client = client;
+            _context = context;
             _consumer.HandleMessage += Consumer_HandleMessage;
         }
 
@@ -65,7 +69,8 @@ namespace Archimedes.Service.Strategy
                             strategy.StartDate = levels.Min(a => a.TimeStamp);
                             strategy.Count = levels.Count;
 
-                            _client.UpdateStrategyMetrics(strategy); 
+                            _client.UpdateStrategyMetrics(strategy);
+                            await _context.Clients.All.SendAsync("update", strategy);
                         }
                     }
                 }

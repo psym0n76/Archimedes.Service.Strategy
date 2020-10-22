@@ -1,6 +1,7 @@
 using Archimedes.Library.Domain;
 using Archimedes.Library.RabbitMq;
 using Archimedes.Service.Strategy.Http;
+using Archimedes.Service.Strategy.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,7 @@ namespace Archimedes.Service.Strategy
         {
             var config = Configuration.GetSection("AppSettings").Get<Config>();
             services.AddLogging();
+            services.AddSignalR();
             services.AddHostedService<StrategySubscriberService>();
             services.AddControllers();
             services.AddHttpClient<IHttpRepositoryClient, HttpRepositoryClient>();
@@ -55,6 +57,7 @@ namespace Archimedes.Service.Strategy
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<StrategyHub>("/Hubs/Strategy");
             });
         }
     }
