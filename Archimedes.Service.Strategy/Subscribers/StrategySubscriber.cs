@@ -54,15 +54,18 @@ namespace Archimedes.Service.Strategy
                     {
                         var levels =
                             _priceLevelStrategy.Calculate(
-                                candles.Where(a => a.TimeStamp >= strategy.EndDate).ToList(), 7); // pass in startDate
+                                candles.Where(a => a.TimeStamp >= strategy.StartDate && a.TimeStamp >= strategy.EndDate)
+                                    .ToList(), 7);
 
                         if (levels != null)
                         {
                             _client.AddPriceLevel(levels);
 
                             strategy.EndDate = levels.Max(a => a.TimeStamp);
+                            strategy.StartDate = levels.Min(a => a.TimeStamp);
+                            strategy.Count = levels.Count;
 
-                            _client.UpdateStrategyMetrics(strategy); // update start datefrom  
+                            _client.UpdateStrategyMetrics(strategy); 
                         }
                     }
                 }
