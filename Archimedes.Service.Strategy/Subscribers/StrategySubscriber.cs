@@ -68,6 +68,7 @@ namespace Archimedes.Service.Strategy
                             strategy.EndDate = levels.Max(a => a.TimeStamp);
                             strategy.StartDate = levels.Min(a => a.TimeStamp);
                             strategy.Count = levels.Count;
+                            strategy.LastUpdated = DateTime.Now;
 
                             _client.UpdateStrategyMetrics(strategy);
                             await _context.Clients.All.SendAsync("Update", strategy);
