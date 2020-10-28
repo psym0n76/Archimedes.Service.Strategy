@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archimedes.Library" Version="1.0.215" />
+    <PackageReference Include="Archimedes.Library" Version="1.0.219" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Moq" Version="4.14.7" />
     <PackageReference Include="nunit" Version="3.12.0" />

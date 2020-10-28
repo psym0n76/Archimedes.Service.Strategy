@@ -57,7 +57,7 @@ namespace Archimedes.Service.Strategy
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<StrategyHub>("/Hubs/Strategy");
+                endpoints.MapHub<StrategyHub>("/hubs/strategy");
             });
         }
     }
