@@ -1,11 +1,14 @@
 ﻿using System;
-using Microsoft.AspNetCore.Routing;
 
 namespace Archimedes.Service.Strategy.TradeEngine
 {
     public class Trade : IObserver
     {
         private readonly PriceBank _dataSource;
+
+        public Trade()
+        {
+        }
 
         public Trade(PriceBank dataSource)
         {

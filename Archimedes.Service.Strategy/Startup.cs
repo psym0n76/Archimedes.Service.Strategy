@@ -25,7 +25,7 @@ namespace Archimedes.Service.Strategy
             var config = Configuration.GetSection("AppSettings").Get<Config>();
             services.AddLogging();
             services.AddSignalR();
-            services.AddHostedService<StrategySubscriberService>();
+
             services.AddControllers();
             services.AddHttpClient<IHttpRepositoryClient, HttpRepositoryClient>();
             services.Configure<Config>(Configuration.GetSection("AppSettings"));

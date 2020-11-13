@@ -37,11 +37,11 @@ namespace Archimedes.Service.Strategy
                     Market = candle.Market,
                     Active = "True",
 
-                    AskPrice = double.Parse(candle.Top().Ask.ToString(CultureInfo.InvariantCulture)),
-                    AskPriceRange = double.Parse(candle.High.Ask.ToString(CultureInfo.InvariantCulture)),
+                    AskPrice = candle.Top().Ask,
+                    AskPriceRange = candle.High.Ask,
 
-                    BidPrice = double.Parse(candle.Top().Bid.ToString(CultureInfo.InvariantCulture)),
-                    BidPriceRange = double.Parse(candle.High.Bid.ToString(CultureInfo.InvariantCulture)),
+                    BidPrice = candle.Top().Bid,
+                    BidPriceRange = candle.High.Bid,
 
                     Strategy = "PIVOT HIGH " + pivotCount,
                     TradeType = "SELL",

@@ -66,10 +66,10 @@ namespace Archimedes.Service.Strategy
         private static Candle LoadCandle(CandleDto dto)
         {
             var candle = new Candle(
-                new Open(dto.BidOpen.ToDecimal(), dto.AskOpen.ToDecimal()),
-                new High(dto.BidHigh.ToDecimal(), dto.AskHigh.ToDecimal()),
-                new Low(dto.BidLow.ToDecimal(), dto.AskLow.ToDecimal()),
-                new Close(dto.BidClose.ToDecimal(), dto.AskClose.ToDecimal()),
+                new Open(dto.BidOpen, dto.AskOpen),
+                new High(dto.BidHigh, dto.AskHigh),
+                new Low(dto.BidLow, dto.AskLow),
+                new Close(dto.BidClose, dto.AskClose),
                 dto.Market, dto.Granularity, dto.TimeStamp);
             return candle;
         }
@@ -96,10 +96,10 @@ namespace Archimedes.Service.Strategy
 
             return historyCandles.Select(hist =>
                 new Candle(
-                    new Open(hist.BidOpen.ToDecimal(), hist.AskOpen.ToDecimal()),
-                    new High(hist.BidHigh.ToDecimal(), hist.AskHigh.ToDecimal()),
-                    new Low(hist.BidLow.ToDecimal(), hist.AskLow.ToDecimal()),
-                    new Close(hist.BidClose.ToDecimal(), hist.AskClose.ToDecimal()), 
+                    new Open(hist.BidOpen, hist.AskOpen),
+                    new High(hist.BidHigh, hist.AskHigh),
+                    new Low(hist.BidLow, hist.AskLow),
+                    new Close(hist.BidClose, hist.AskClose), 
                     hist.Market, hist.Granularity, hist.TimeStamp)).ToList();
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
@@ -40,6 +41,11 @@ namespace Archimedes.Service.Strategy
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.CaptureStartupErrors(false);
-                }).UseNLog();
+                }).UseNLog()
+                .ConfigureServices(services =>
+                {
+                    services.AddHostedService<PriceSubscriptionService>();
+                    services.AddHostedService<StrategySubscriberService>();
+                }); // this ensures we have logging
     }
 }
