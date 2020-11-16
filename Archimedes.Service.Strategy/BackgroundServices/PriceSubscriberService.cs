@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Archimedes.Library.Domain;
 using Archimedes.Library.Message.Dto;
@@ -39,20 +40,19 @@ namespace Archimedes.Service.Strategy
                 try
                 {
                     await _connection.StartAsync(cancellationToken);
-
                     break;
                 }
-                catch
+                catch(Exception e)
                 {
-                    await Task.Delay(1000, cancellationToken);
+                    _logger.LogWarning($"Error from connection start: {e.Message}");
+                    await Task.Delay(10000, cancellationToken);
                 }
             }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _connection.DisposeAsync();
-            return  Task.CompletedTask;
+            return _connection.DisposeAsync();
         }
 
         public Task Update(PriceDto price)
