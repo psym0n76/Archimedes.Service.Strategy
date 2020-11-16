@@ -44,7 +44,6 @@ namespace Archimedes.Service.Strategy
                 }).UseNLog()
                 .ConfigureServices(services =>
                 {
-                    services.AddHostedService<PriceSubscriptionService>();
                     services.AddHostedService<StrategySubscriberService>();
                 }); // this ensures we have logging
     }
