@@ -44,7 +44,7 @@ namespace Archimedes.Service.Strategy
                     BidPriceRange = candle.Low.Bid,
 
                     Strategy = "PIVOT LOW " + pivotCount,
-                    TradeType = "BUY",
+                    BuySell = "BUY",
                     CandleType = candle.BodyFillRate().ToString(CultureInfo.InvariantCulture),
                     LastUpdated = DateTime.Now,
 

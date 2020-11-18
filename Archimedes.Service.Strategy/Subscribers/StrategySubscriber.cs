@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using Archimedes.Library.Message;
+﻿using Archimedes.Library.Message;
 using Archimedes.Library.RabbitMq;
 using Archimedes.Service.Strategy.Http;
 using Archimedes.Service.Strategy.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Linq;
+using System.Threading;
 
 namespace Archimedes.Service.Strategy
 {
