@@ -58,7 +58,7 @@ namespace Archimedes.Service.Strategy
                     {
                         var levels =
                             _priceLevelStrategy.Calculate(
-                                candles.Where(a => a.TimeStamp >= strategy.StartDate && a.TimeStamp >= strategy.EndDate)
+                                candles.Where(a => a.TimeStamp >= strategy.EndDate)
                                     .ToList(), 7);
 
                         if (levels != null)
@@ -66,7 +66,7 @@ namespace Archimedes.Service.Strategy
                             _client.AddPriceLevel(levels);
 
                             strategy.EndDate = levels.Max(a => a.TimeStamp);
-                            strategy.StartDate = levels.Min(a => a.TimeStamp);
+                            //strategy.StartDate = levels.Min(a => a.TimeStamp);
                             strategy.Count = levels.Count;
                             strategy.LastUpdated = DateTime.Now;
 
