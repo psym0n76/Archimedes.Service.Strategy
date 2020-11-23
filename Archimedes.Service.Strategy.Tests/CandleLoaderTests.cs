@@ -50,7 +50,7 @@ namespace Archimedes.Service.Strategy.Tests
             
             Assert.AreEqual(97,result.Count);
 
-            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 50); // increased to 50 for debugging, 25 causes too many fails
+            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 100); // increased to 50 for debugging, 25 causes too many fails
             TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
         }
 
