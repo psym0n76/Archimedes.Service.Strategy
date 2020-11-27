@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Message.Dto;
-using Archimedes.Service.Strategy.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -67,14 +66,14 @@ namespace Archimedes.Service.Strategy.Tests
             stopWatch.Start();
             var result = subject.Calculate(largeCandle, 7);
 
- 
             TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
             TestContext.Out.WriteLine($"Levels created: {result.Count}");
             TestContext.Out.WriteLine($"Candle processed: {largeCandle.Count}");
             TestContext.Out.WriteLine($"Hours: {largeCandle.Count / 4}");
             TestContext.Out.WriteLine($"Days: {largeCandle.Count / 4 / 24}");
             TestContext.Out.WriteLine($"Years: {largeCandle.Count / 4 / 24 / 365}");
-            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 175);
+
+            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 200);
         }
 
 
@@ -126,7 +125,7 @@ namespace Archimedes.Service.Strategy.Tests
             var data = new FileReader();
             var candleDto = data.Reader<CandleDto>("GBPUSD_15Min_202010072200_202010082200");
 
-            _candles = GetCandleLoader().Load("GBP/USD", "15Min", 15,candleDto);
+            _candles = GetCandleLoader().Load(candleDto);
         }
 
         private static ICandleLoader GetCandleLoader()

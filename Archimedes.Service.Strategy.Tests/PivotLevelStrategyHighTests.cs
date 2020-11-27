@@ -61,7 +61,7 @@ namespace Archimedes.Service.Strategy.Tests
         {
             var data = new FileReader();
             var candleDto = data.Reader<CandleDto>("GBPUSD_15Min_202010072200_202010082200");
-            _candles = GetCandleLoader().Load("GBP/USD", "15Min", 15, candleDto);
+            _candles = GetCandleLoader().Load(candleDto);
         }
 
         private static ICandleLoader GetCandleLoader()
