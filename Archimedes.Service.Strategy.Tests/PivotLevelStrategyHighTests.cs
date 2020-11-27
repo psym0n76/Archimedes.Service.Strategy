@@ -57,23 +57,16 @@ namespace Archimedes.Service.Strategy.Tests
             Assert.IsTrue(result.Any(a => a.TimeStamp == expectedTimestamp));
         }
 
-        private async void LoadMockCandles()
+        private void LoadMockCandles()
         {
-            _candles = await GetCandleLoader().Load("GBP/USD", "15Min", 15);
+            var data = new FileReader();
+            var candleDto = data.Reader<CandleDto>("GBPUSD_15Min_202010072200_202010082200");
+            _candles = GetCandleLoader().Load("GBP/USD", "15Min", 15, candleDto);
         }
 
         private static ICandleLoader GetCandleLoader()
         {
-            var data = new FileReader();
-            var candleDto = data.Reader<CandleDto>("GBPUSD_15Min_202010072200_202010082200");
-
-            var mockRep = new Mock<IHttpRepositoryClient>();
-            mockRep.Setup(a => a.GetCandlesByGranularityMarket(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(candleDto);
-
-            var mockLogger = new Mock<ILogger<CandleLoader>>();
-
-            return new CandleLoader(mockRep.Object, mockLogger.Object);
+            return new CandleLoader();
         }
 
         private static PivotLevelStrategyHigh GetSubjectUnderTest()

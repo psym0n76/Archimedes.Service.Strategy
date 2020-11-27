@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Threading;
+using Archimedes.Library.Candles;
 
 namespace Archimedes.Service.Strategy
 {
@@ -49,8 +50,9 @@ namespace Archimedes.Service.Strategy
         {
             try
             {
+                var marketCandles =  await _client.GetCandlesByGranularityMarket(message.Market, message.Granularity);
                 var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
-                var candles = await _loader.Load(message.Market, message.Granularity, message.Interval);
+                var candles = _loader.Load(message.Market, message.Granularity, message.Interval, marketCandles);
 
                 foreach (var strategy in strategies)
                 {

@@ -1,3 +1,4 @@
+using Archimedes.Library.Candles;
 using Archimedes.Library.Domain;
 using Archimedes.Library.RabbitMq;
 using Archimedes.Service.Strategy.Http;

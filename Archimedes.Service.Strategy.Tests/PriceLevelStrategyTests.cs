@@ -67,13 +67,14 @@ namespace Archimedes.Service.Strategy.Tests
             stopWatch.Start();
             var result = subject.Calculate(largeCandle, 7);
 
-            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 150);
+ 
             TestContext.Out.WriteLine($"Elapsed Time: {stopWatch.Elapsed.TotalMilliseconds}ms");
             TestContext.Out.WriteLine($"Levels created: {result.Count}");
             TestContext.Out.WriteLine($"Candle processed: {largeCandle.Count}");
             TestContext.Out.WriteLine($"Hours: {largeCandle.Count / 4}");
             TestContext.Out.WriteLine($"Days: {largeCandle.Count / 4 / 24}");
             TestContext.Out.WriteLine($"Years: {largeCandle.Count / 4 / 24 / 365}");
+            Assert.IsTrue(stopWatch.Elapsed.TotalMilliseconds < 175);
         }
 
 
@@ -120,23 +121,17 @@ namespace Archimedes.Service.Strategy.Tests
             Assert.AreEqual(13, result.Count);
         }
 
-        private async void LoadMockCandles()
-        {
-            _candles = await GetCandleLoader().Load("GBP/USD", "15Min", 15);
-        }
-
-        private static ICandleLoader GetCandleLoader()
+        private void LoadMockCandles()
         {
             var data = new FileReader();
             var candleDto = data.Reader<CandleDto>("GBPUSD_15Min_202010072200_202010082200");
 
-            var mockRep = new Mock<IHttpRepositoryClient>();
-            mockRep.Setup(a => a.GetCandlesByGranularityMarket(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(candleDto);
+            _candles = GetCandleLoader().Load("GBP/USD", "15Min", 15,candleDto);
+        }
 
-            var mockLogger = new Mock<ILogger<CandleLoader>>();
-
-            return new CandleLoader(mockRep.Object, mockLogger.Object);
+        private static ICandleLoader GetCandleLoader()
+        {
+            return new CandleLoader();
         }
 
         private static PriceLevelStrategy GetSubjectUnderTest()
