@@ -35,7 +35,7 @@ namespace Archimedes.Service.Strategy
                     TimeStamp = candle.TimeStamp,
                     Granularity = candle.TimeFrame,
                     Market = candle.Market,
-                    Active = "True",
+                    Active = true,
 
                     AskPrice = candle.Top().Ask,
                     AskPriceRange = candle.High.Ask,
