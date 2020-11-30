@@ -63,8 +63,9 @@ namespace Archimedes.Service.Strategy
                                 candles.Where(a => a.TimeStamp >= strategy.EndDate)
                                     .ToList(), 7);
 
-                        if (levels != null)
+                        if (levels == null) continue;
                         {
+                            if (!levels.Any()) continue;
                             _client.AddPriceLevel(levels);
 
                             strategy.EndDate = levels.Max(a => a.TimeStamp);

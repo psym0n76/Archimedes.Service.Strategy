@@ -114,7 +114,6 @@ namespace Archimedes.Service.Strategy.Http
                 var payload = new JsonContent(strategy);
                 var response = await _client.PutAsync("strategy", payload);
 
-
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError($"Failed to Post {response.ReasonPhrase} from {_client.BaseAddress}strategy");
