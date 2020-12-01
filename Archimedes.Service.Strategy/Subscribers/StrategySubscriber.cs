@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Archimedes.Library.Candles;
+using Archimedes.Library.Message.Dto;
 
 namespace Archimedes.Service.Strategy
 {
@@ -20,9 +22,10 @@ namespace Archimedes.Service.Strategy
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
         private readonly IHubContext<StrategyHub> _context;
+        private readonly IProducerFanout<List<PriceLevelDto>> _producerFanout;
 
         public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader,
-            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context)
+            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context, IProducerFanout<List<PriceLevelDto>> producerFanout)
         {
             _logger = logger;
             _consumer = consumer;
@@ -30,6 +33,7 @@ namespace Archimedes.Service.Strategy
             _priceLevelStrategy = priceLevelStrategy;
             _client = client;
             _context = context;
+            _producerFanout = producerFanout;
             _consumer.HandleMessage += Consumer_HandleMessage;
         }
 
@@ -66,6 +70,9 @@ namespace Archimedes.Service.Strategy
                         if (levels == null) continue;
                         {
                             if (!levels.Any()) continue;
+
+                            _producerFanout.PublishMessage(levels,"Archimedes_Price_Level");
+                            //push to fanout
                             _client.AddPriceLevel(levels);
 
                             strategy.EndDate = levels.Max(a => a.TimeStamp);
