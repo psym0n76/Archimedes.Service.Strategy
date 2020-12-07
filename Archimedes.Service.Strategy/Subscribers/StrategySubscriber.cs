@@ -58,14 +58,17 @@ namespace Archimedes.Service.Strategy
                 var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
                 var candles = _loader.Load(marketCandles);
 
+                _logger.LogInformation($"Loaded {marketCandles.Count} ready for Strategy Subscriber analysis for Market: {message.Market} and Granularity {message.Granularity}");
+                _logger.LogInformation($"Loaded {strategies.Count} ready for Strategy Subscriber analysis for Market: {message.Market} and Granularity {message.Granularity}");
+                _logger.LogInformation($"Loaded {candles.Count} ready for Strategy Subscriber analysis for Market: {message.Market} and Granularity {message.Granularity}");
+
                 foreach (var strategy in strategies)
                 {
                     if (strategy.Active)
                     {
                         var levels =
                             _priceLevelStrategy.Calculate(
-                                candles.Where(a => a.TimeStamp >= strategy.EndDate)
-                                    .ToList(), 7);
+                                candles.Where(a => a.TimeStamp >= strategy.EndDate).ToList(), 7);
 
                         if (levels == null) continue;
                         {
