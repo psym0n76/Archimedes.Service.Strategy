@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archimedes.Service.Strategy", "Archimedes.Service.Strategy\Archimedes.Service.Strategy.csproj", "{D1A066D3-28F6-4C54-8F4E-BAC90AAC053E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Archimedes.Service.Strategy", "Archimedes.Service.Strategy\Archimedes.Service.Strategy.csproj", "{D1A066D3-28F6-4C54-8F4E-BAC90AAC053E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archimedes.Service.Strategy.Tests", "Archimedes.Service.Strategy.Tests\Archimedes.Service.Strategy.Tests.csproj", "{BD883073-9105-42AC-B3EA-1E6B225A94CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Archimedes.Service.Strategy.Tests", "Archimedes.Service.Strategy.Tests\Archimedes.Service.Strategy.Tests.csproj", "{BD883073-9105-42AC-B3EA-1E6B225A94CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
