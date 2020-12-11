@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Archimedes.Library.Candles;
+using Archimedes.Library.Logger;
 using Archimedes.Library.Message.Dto;
 
 namespace Archimedes.Service.Strategy
@@ -23,9 +23,12 @@ namespace Archimedes.Service.Strategy
         private readonly IHttpRepositoryClient _client;
         private readonly IHubContext<StrategyHub> _context;
         private readonly IProducerFanout<PriceLevelDto> _producerFanout;
+        private readonly BatchLog _batchLog = new BatchLog();
+        private string _logId;
 
         public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader,
-            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context, IProducerFanout<PriceLevelDto> producerFanout)
+            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context,
+            IProducerFanout<PriceLevelDto> producerFanout)
         {
             _logger = logger;
             _consumer = consumer;
@@ -44,9 +47,10 @@ namespace Archimedes.Service.Strategy
 
         private void Consumer_HandleMessage(object sender, MessageHandlerEventArgs args)
         {
+            _logId = _batchLog.Start();
             var message = JsonConvert.DeserializeObject<StrategyMessage>(args.Message);
 
-            _logger.LogInformation($"Received from StrategyResponseQueue: {message}");
+            _batchLog.Update(_logId, "Request from StrategyResponseQueue");
             RunStrategies(message);
         }
 
@@ -54,28 +58,38 @@ namespace Archimedes.Service.Strategy
         {
             try
             {
-                var marketCandles =  await _client.GetCandlesByGranularityMarket(message.Market, message.Granularity);
-                var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
-                var candles = _loader.Load(marketCandles);
+                var marketCandles = await _client.GetCandlesByGranularityMarket(message.Market, message.Granularity);
+                _batchLog.Update(_logId,
+                    $"Loaded {marketCandles.Count} MarketCandles ready for Strategy Subscriber analysis for {message.Market} {message.Granularity}");
 
-                _logger.LogInformation($"Loaded {marketCandles.Count} ready for Strategy Subscriber analysis for Market: {message.Market} and Granularity {message.Granularity}");
-                _logger.LogInformation($"Loaded {strategies.Count} ready for Strategy Subscriber analysis for Market: {message.Market} and Granularity {message.Granularity}");
-                _logger.LogInformation($"Loaded {candles.Count} ready for Strategy Subscriber analysis for Market: {message.Market} and Granularity {message.Granularity}");
+                var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
+                _batchLog.Update(_logId, $"Loaded {marketCandles.Count} Strategies ready for Strategy Subscriber");
+
+                var candles = _loader.Load(marketCandles);
+                _batchLog.Update(_logId, $"Loaded {candles.Count} Candles ready for Strategy Subscriber");
 
                 foreach (var strategy in strategies)
                 {
                     if (strategy.Active)
                     {
+                        _batchLog.Update(_logId, $"Starting strategy {strategy.Name}");
+
                         var levels =
                             _priceLevelStrategy.Calculate(
                                 candles.Where(a => a.TimeStamp >= strategy.EndDate).ToList(), 7);
 
-                        if (levels == null) continue;
-                        {
-                            if (!levels.Any()) continue;
+                        _batchLog.Update(_logId, $"PriceLevels response {levels.Count}");
 
-                            _producerFanout.PublishMessages(levels,"Archimedes_Price_Level");
-                            //push to fanout
+                        if (!levels.Any())
+                        {
+                            continue;
+                        }
+
+                        {
+                            _batchLog.Update(_logId, $"Publish to ArchimedesPriceLevels");
+                            _producerFanout.PublishMessages(levels, "Archimedes_Price_Level");
+
+                            _batchLog.Update(_logId, $"Post PriceLevels to Repo API");
                             _client.AddPriceLevel(levels);
 
                             strategy.EndDate = levels.Max(a => a.TimeStamp);
@@ -83,11 +97,17 @@ namespace Archimedes.Service.Strategy
                             strategy.Count = levels.Count;
                             strategy.LastUpdated = DateTime.Now;
 
+                            _batchLog.Update(_logId, $"Update StrategyMetrics to Repo API");
                             _client.UpdateStrategyMetrics(strategy);
+
+                            _batchLog.Update(_logId, $"Publish StrategyMetrics to Hub");
                             await _context.Clients.All.SendAsync("Update", strategy);
+                            _batchLog.Update(_logId, $"Ending strategy {strategy.Name}");
                         }
                     }
                 }
+
+                _logger.LogInformation(_batchLog.Print(_logId));
             }
             catch (Exception e)
             {
