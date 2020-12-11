@@ -58,15 +58,23 @@ namespace Archimedes.Service.Strategy
         {
             try
             {
+                var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
+                _batchLog.Update(_logId, $"Loaded {strategies.Count} Strategies against {message.Market} {message.Granularity}" );
+
+                if (!strategies.Any())
+                {
+                    _batchLog.Update(_logId,"No Strategies found");
+                    _logger.LogInformation(_batchLog.Print(_logId));
+                    return;
+                }
+
                 var marketCandles = await _client.GetCandlesByGranularityMarket(message.Market, message.Granularity);
                 _batchLog.Update(_logId,
-                    $"Loaded {marketCandles.Count} MarketCandles ready for Strategy Subscriber analysis for {message.Market} {message.Granularity}");
+                    $"Loaded {marketCandles.Count} MarketCandles");
 
-                var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
-                _batchLog.Update(_logId, $"Loaded {marketCandles.Count} Strategies ready for Strategy Subscriber");
 
                 var candles = _loader.Load(marketCandles);
-                _batchLog.Update(_logId, $"Loaded {candles.Count} Candles ready for Strategy Subscriber");
+                _batchLog.Update(_logId, $"Loaded {candles.Count} Candles in CandleLoader");
 
                 foreach (var strategy in strategies)
                 {
