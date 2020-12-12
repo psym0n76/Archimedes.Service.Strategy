@@ -23,6 +23,7 @@ namespace Archimedes.Service.Strategy
             {
                 try
                 {
+                    _logger.LogInformation($"Subscribing to  StrategyRequestQueue");
                     _strategySubscriber.Consume(stoppingToken);
                 }
                 catch (Exception e)
