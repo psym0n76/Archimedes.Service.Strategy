@@ -99,7 +99,7 @@ namespace Archimedes.Service.Strategy.Http
                 }
 
                 _logger.LogInformation(
-                    $"\n\n ADDED {priceLevel} Price Levels\n");
+                    $"ADDED PriceLevels {priceLevel} Price Levels\n");
             }
             catch (Exception e)
             {
@@ -120,7 +120,7 @@ namespace Archimedes.Service.Strategy.Http
                 }
 
                 _logger.LogInformation(
-                    $"\n\n ADDED {strategy}\n");
+                    $"UPDATED Strategy Statistics {strategy}\n");
             }
             catch (Exception e)
             {
