@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -77,7 +78,19 @@ namespace Archimedes.Service.Strategy.Http
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError($"GET Failed: {response.ReasonPhrase} from {response.RequestMessage.RequestUri}");
+                var errorResponse = "";
+
+                var t = await response.Content.ReadAsStreamAsync();
+
+                using (var r = new StreamReader(
+                    await response.Content.ReadAsStreamAsync()))
+                {
+                    errorResponse = await r.ReadToEndAsync();
+                }
+
+                if (response.RequestMessage != null)
+                    _logger.LogError(
+                        $"GET Failed: {response.ReasonPhrase}  {errorResponse} from {response.RequestMessage.RequestUri}");
                 return null;
             }
 
