@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Archimedes.Library.Candles;
+using Archimedes.Library.Logger;
 using Archimedes.Library.Message.Dto;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +12,8 @@ namespace Archimedes.Service.Strategy
     public class PivotLevelStrategyHigh : IPivotLevelStrategyHigh
     {
         private readonly ILogger<PivotLevelStrategyHigh> _logger;
+        private readonly BatchLog _batchLog = new BatchLog();
+        private string _logId;
 
         public PivotLevelStrategyHigh(ILogger<PivotLevelStrategyHigh> logger)
         {
@@ -19,6 +22,9 @@ namespace Archimedes.Service.Strategy
 
         public List<PriceLevelDto> Calculate(List<Candle> candles, int pivotCount)
         {
+            _logId = _batchLog.Start();
+            _batchLog.Update(_logId,"Start Pivot Level High");
+            
             var priceLevels = new List<PriceLevelDto>();
 
             foreach (var candle in candles)
@@ -28,7 +34,7 @@ namespace Archimedes.Service.Strategy
 
                 if (!pastPivotHigh || !futurePivotHigh) continue;
 
-                _logger.LogInformation($"PivotHigh found: {candle}");
+                _batchLog.Update(_logId, $"PivotHigh found: {candle}");
 
                 var p = new PriceLevelDto()
                 {
@@ -52,6 +58,8 @@ namespace Archimedes.Service.Strategy
                 priceLevels.Add(p);
             }
 
+            _logger.LogInformation(_batchLog.Print(_logId));
+            
             return priceLevels;
         }
 

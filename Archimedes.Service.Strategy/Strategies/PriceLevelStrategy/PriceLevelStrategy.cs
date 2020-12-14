@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Extensions;
+using Archimedes.Library.Logger;
 using Archimedes.Library.Message.Dto;
 using Microsoft.Extensions.Logging;
 
@@ -15,6 +15,8 @@ namespace Archimedes.Service.Strategy
         private readonly ILogger<PriceLevelStrategy> _logger;
         private readonly IPivotLevelStrategyHigh _levelStrategyHigh;
         private readonly IPivotLevelStrategyLow _levelStrategyLow;
+        private readonly BatchLog _batchLog = new();
+        private string _logId;
 
         public PriceLevelStrategy(ILogger<PriceLevelStrategy> logger, IPivotLevelStrategyHigh levelStrategyHigh,
             IPivotLevelStrategyLow levelStrategyLow)
@@ -26,19 +28,20 @@ namespace Archimedes.Service.Strategy
 
         public List<PriceLevelDto> Calculate(List<Candle> candles, int pivotCount)
         {
+            _logId = _batchLog.Start();
+            
+            _batchLog.Update(_logId,"Pivot Level Strategy");
+            
             if (candles == null)
             {
-                _logger.LogError("PriceLevelStrategy: Candle Collection empty");
-                return default;
+                _batchLog.Print(_logId, "Candle Collection empty");
+                return null;
             }
 
             var market = candles.First().Market;
             var timeFrame = candles.First().TimeFrame;
 
-            _logger.LogInformation($"PriceLevelStrategy STARTED: Market: {market} TimeFrame: {timeFrame} Candles: {candles.Count} with Pivot: {pivotCount}");
-
-            var timer = new Stopwatch();
-            timer.Start();
+            _batchLog.Update(_logId, $"STARTED: Market: {market} TimeFrame: {timeFrame} Candles: {candles.Count} with Pivot: {pivotCount}");
 
             var candleLevelsBag = new ConcurrentBag<PriceLevelDto>();
 
@@ -53,12 +56,10 @@ namespace Archimedes.Service.Strategy
             });
 
             Task.WaitAll(taskPivotHigh, taskPivotLow);
-
-            _logger.LogInformation(
-                $"PriceLevelStrategy ENDED: Market: {market} TimeFrame: {timeFrame} Candles: {candles.Count} with Pivot: {pivotCount} in {timer.Elapsed.Seconds}secs");
+            
+            _logger.LogInformation(_batchLog.Print(_logId, $"ENDED: Market: {market} TimeFrame: {timeFrame}"));
 
             return candleLevelsBag.OrderBy(a => a.TimeStamp).ToList();
         }
     }
 }
-

@@ -78,16 +78,8 @@ namespace Archimedes.Service.Strategy.Http
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorResponse = "";
-
-                var t = await response.Content.ReadAsStreamAsync();
-
-                using (var r = new StreamReader(
-                    await response.Content.ReadAsStreamAsync()))
-                {
-                    errorResponse = await r.ReadToEndAsync();
-                }
-
+                var errorResponse = await response.Content.ReadAsAsync<string>();
+                
                 if (response.RequestMessage != null)
                     _logger.LogError(
                         $"GET Failed: {response.ReasonPhrase}  {errorResponse} from {response.RequestMessage.RequestUri}");

@@ -82,10 +82,6 @@ namespace Archimedes.Service.Strategy
 
                     _batchLog.Update(_logId, $"Starting strategy {strategy.Name}");
 
-                    //var levels =
-                    //    _priceLevelStrategy.Calculate(
-                    //        candles.Where(a => a.TimeStamp >= strategy.EndDate).ToList(), 7);
-
                     var levels = _priceLevelStrategy.Calculate(candles, 7);
 
                     _batchLog.Update(_logId, $"PriceLevels response {levels.Count}");
@@ -103,7 +99,6 @@ namespace Archimedes.Service.Strategy
                         _client.AddPriceLevel(levels);
 
                         strategy.EndDate = levels.Max(a => a.TimeStamp);
-                        //strategy.StartDate = levels.Min(a => a.TimeStamp);
                         strategy.Count = levels.Count;
                         strategy.LastUpdated = DateTime.Now;
 
@@ -121,14 +116,12 @@ namespace Archimedes.Service.Strategy
             }
             catch (Exception e)
             {
-                _batchLog.Update(_logId, $"Unable to run Strategies  {e.Message} {e.StackTrace}");
-                _logger.LogError(_batchLog.Print(_logId));
+                _logger.LogError(_batchLog.Print(_logId, $"Unable to run Strategies  {e.Message} {e.StackTrace}"));
             }
         }
 
         private async Task<List<Candle>> LoadCandles(StrategyMessage message, DateTime endDate)
         {
-            //var marketCandles = await _client.GetCandlesByGranularityMarket(message.Market, message.Granularity);
             var marketCandles = await _client.GetCandlesByGranularityMarketByDate(message.Market, message.Granularity,
                 endDate, DateTime.Now);
 
