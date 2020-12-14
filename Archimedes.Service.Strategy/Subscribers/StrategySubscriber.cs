@@ -59,11 +59,11 @@ namespace Archimedes.Service.Strategy
             try
             {
                 var strategies = await _client.GetStrategiesByGranularityMarket(message.Market, message.Granularity);
-                _batchLog.Update(_logId, $"Loaded {strategies.Count} Strategies against {message.Market} {message.Granularity}" );
+                _batchLog.Update(_logId, $"Loaded {strategies.Count} strategies against {message.Market} {message.Granularity}" );
 
                 if (!strategies.Any())
                 {
-                    _batchLog.Update(_logId,"No Strategies found");
+                    _batchLog.Update(_logId,"No Active strategies found");
                     _logger.LogInformation(_batchLog.Print(_logId));
                     return;
                 }
