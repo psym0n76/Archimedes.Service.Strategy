@@ -59,7 +59,9 @@ namespace Archimedes.Service.Strategy
             
             _logger.LogInformation(_batchLog.Print(_logId, $"ENDED: Market: {market} TimeFrame: {timeFrame}"));
 
-            return candleLevelsBag.OrderBy(a => a.TimeStamp).ToList();
+            var orderedList = candleLevelsBag.OrderBy(a => a.TimeStamp);
+
+            return orderedList.ToList();
         }
     }
 }
