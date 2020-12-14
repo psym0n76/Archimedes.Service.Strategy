@@ -74,7 +74,7 @@ namespace Archimedes.Service.Strategy.Http
 
         public async Task<List<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity, DateTime startDate, DateTime endDate)
         {
-            var response = await _client.GetAsync($"candle/bymarket_bygranularity_fromdate_todate?market={market}&granularity={granularity}&fromdate{startDate}&todate{endDate}");
+            var response = await _client.GetAsync($"candle/bymarket_bygranularity_fromdate_todate?market={market}&granularity={granularity}&fromdate={startDate}&todate={endDate}");
 
             if (!response.IsSuccessStatusCode)
             {
