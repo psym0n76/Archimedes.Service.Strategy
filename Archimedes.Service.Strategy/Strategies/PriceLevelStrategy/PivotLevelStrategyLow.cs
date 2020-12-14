@@ -38,7 +38,7 @@ namespace Archimedes.Service.Strategy
                     continue;
                 }
 
-                _batchLog.Update(_logId, $"PivotLow found: {candle.TimeStamp} {candle.TimeFrame}");
+                _batchLog.Update(_logId, $"PivotLow found: {candle.TimeFrame} {candle.TimeStamp} ");
 
                 var p = new PriceLevelDto()
                 {
