@@ -12,7 +12,7 @@ namespace Archimedes.Service.Strategy
     public class PivotLevelStrategyLow : IPivotLevelStrategyLow
     {
         private readonly ILogger<PivotLevelStrategyLow> _logger;
-        private readonly BatchLog _batchLog = new BatchLog();
+        private readonly BatchLog _batchLog = new();
         private string _logId;
 
         public PivotLevelStrategyLow(ILogger<PivotLevelStrategyLow> logger)
@@ -22,7 +22,6 @@ namespace Archimedes.Service.Strategy
 
         public List<PriceLevelDto> Calculate(List<Candle> candles, int pivotCount)
         {
-
             _logId = _batchLog.Start();
             _batchLog.Update(_logId, "Start Pivot Level Low");
             
@@ -33,7 +32,11 @@ namespace Archimedes.Service.Strategy
                 var pastPivotLow = PivotLow(candle, candle.PastCandles, pivotCount);
                 var futurePivotLow = PivotLow(candle, candle.FutureCandles, pivotCount);
 
-                if (!pastPivotLow || !futurePivotLow) continue;
+                if (!pastPivotLow || !futurePivotLow)
+                {
+                    _batchLog.Update(_logId, $"Missing PastPivotLow:{pastPivotLow} FuturePivotLow:{futurePivotLow}");
+                    continue;
+                }
 
                 _batchLog.Update(_logId, $"PivotLow found: {candle.TimeStamp} {candle.TimeFrame}");
 

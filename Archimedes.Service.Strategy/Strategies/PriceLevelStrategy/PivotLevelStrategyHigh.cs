@@ -32,7 +32,12 @@ namespace Archimedes.Service.Strategy
                 var pastPivotHigh = PivotHigh(candle, candle.PastCandles, pivotCount);
                 var futurePivotHigh = PivotHigh(candle, candle.FutureCandles, pivotCount);
 
-                if (!pastPivotHigh || !futurePivotHigh) continue;
+                if (!pastPivotHigh || !futurePivotHigh)
+                {
+                    _batchLog.Update(_logId, $"Missing PastPivotHigh:{pastPivotHigh} FuturePivotHigh:{futurePivotHigh}");
+                    continue;
+                }
+
 
                 _batchLog.Update(_logId, $"PivotHigh found: {candle.TimeFrame} {candle.TimeStamp}");
 
