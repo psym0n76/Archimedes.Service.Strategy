@@ -42,7 +42,7 @@ namespace Archimedes.Service.Strategy
 
         public void Consume(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe(cancellationToken);
+            _consumer.Subscribe(cancellationToken, 1000);
         }
 
         private void Consumer_HandleMessage(object sender, MessageHandlerEventArgs args)
