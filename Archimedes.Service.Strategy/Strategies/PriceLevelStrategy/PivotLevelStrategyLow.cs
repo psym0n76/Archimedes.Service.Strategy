@@ -35,7 +35,7 @@ namespace Archimedes.Service.Strategy
 
                 if (!pastPivotLow || !futurePivotLow) continue;
 
-                _batchLog.Update(_logId, $"PivotLow found: {candle}");
+                _batchLog.Update(_logId, $"PivotLow found: {candle.TimeStamp} {candle.TimeFrame}");
 
                 var p = new PriceLevelDto()
                 {

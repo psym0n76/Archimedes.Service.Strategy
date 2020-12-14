@@ -34,7 +34,7 @@ namespace Archimedes.Service.Strategy
 
                 if (!pastPivotHigh || !futurePivotHigh) continue;
 
-                _batchLog.Update(_logId, $"PivotHigh found: {candle}");
+                _batchLog.Update(_logId, $"PivotHigh found: {candle.TimeFrame} {candle.TimeStamp}");
 
                 var p = new PriceLevelDto()
                 {
