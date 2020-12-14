@@ -34,7 +34,7 @@ namespace Archimedes.Service.Strategy
 
                 if (!pastPivotLow || !futurePivotLow)
                 {
-                    _batchLog.Update(_logId, $"Missing PastPivotLow:{pastPivotLow} FuturePivotLow:{futurePivotLow}");
+                    //_batchLog.Update(_logId, $"Missing PastPivotLow:{pastPivotLow} FuturePivotLow:{futurePivotLow}");
                     continue;
                 }
 
