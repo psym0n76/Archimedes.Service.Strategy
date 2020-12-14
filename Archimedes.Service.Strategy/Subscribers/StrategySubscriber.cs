@@ -132,6 +132,12 @@ namespace Archimedes.Service.Strategy
             var marketCandles = await _client.GetCandlesByGranularityMarketByDate(message.Market, message.Granularity,
                 endDate, DateTime.Now);
 
+            if (marketCandles == null)
+            {
+                _batchLog.Update(_logId, $"No Candles in CandleLoader");
+                return null;
+            }
+
             if (!marketCandles.Any())
             {
                 _batchLog.Update(_logId, $"No Candles in CandleLoader");
@@ -139,7 +145,7 @@ namespace Archimedes.Service.Strategy
             }
 
             _batchLog.Update(_logId,
-                $"Loaded {marketCandles.Count} MarketCandles");
+                $"Loaded {marketCandles.Count} Candles");
 
             var candles = _loader.Load(marketCandles);
             _batchLog.Update(_logId, $"Loaded {candles.Count} Candles in CandleLoader");
