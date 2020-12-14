@@ -75,6 +75,11 @@ namespace Archimedes.Service.Strategy
                 {
                     var candles = await LoadCandles(message, strategy.EndDate);
 
+                    if (candles == null)
+                    {
+                        continue;
+                    }
+
                     _batchLog.Update(_logId, $"Starting strategy {strategy.Name}");
 
                     //var levels =
@@ -116,7 +121,8 @@ namespace Archimedes.Service.Strategy
             }
             catch (Exception e)
             {
-                _logger.LogError($"Unable to Update Market Metrics message {e.Message} {e.StackTrace}");
+                _batchLog.Update(_logId, $"Unable to run Strategies  {e.Message} {e.StackTrace}");
+                _logger.LogError(_batchLog.Print(_logId));
             }
         }
 
@@ -126,10 +132,14 @@ namespace Archimedes.Service.Strategy
             var marketCandles = await _client.GetCandlesByGranularityMarketByDate(message.Market, message.Granularity,
                 endDate, DateTime.Now);
 
+            if (!marketCandles.Any())
+            {
+                _batchLog.Update(_logId, $"No Candles in CandleLoader");
+                return null;
+            }
 
             _batchLog.Update(_logId,
                 $"Loaded {marketCandles.Count} MarketCandles");
-
 
             var candles = _loader.Load(marketCandles);
             _batchLog.Update(_logId, $"Loaded {candles.Count} Candles in CandleLoader");
