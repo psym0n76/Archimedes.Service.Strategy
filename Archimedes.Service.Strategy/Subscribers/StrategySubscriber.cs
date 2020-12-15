@@ -123,7 +123,7 @@ namespace Archimedes.Service.Strategy
         private async Task<List<Candle>> LoadCandles(StrategyMessage message, DateTime endDate)
         {
             var marketCandles = await _client.GetCandlesByGranularityMarketByDate(message.Market, message.Granularity,
-                endDate, DateTime.Now);
+                endDate.AddDays(-1), DateTime.Now);
 
             if (marketCandles == null)
             {
