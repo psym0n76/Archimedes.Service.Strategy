@@ -98,7 +98,8 @@ namespace Archimedes.Service.Strategy
                         {
                             Market = strategy.Market,
                             Strategy = strategy.Name,
-                            PriceLevels = levels
+                            PriceLevels = levels,
+                            Granularity = strategy.Granularity
                         };
                         
                         _producerFanout.PublishMessage(priceLevelMessage, "Archimedes_Price_Level");
