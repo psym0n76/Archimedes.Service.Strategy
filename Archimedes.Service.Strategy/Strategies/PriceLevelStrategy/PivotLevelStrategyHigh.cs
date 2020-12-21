@@ -34,7 +34,7 @@ namespace Archimedes.Service.Strategy
 
                 if (!pastPivotHigh || !futurePivotHigh)
                 {
-                    _batchLog.Update(_logId, $"Missing PastPivotHigh:{pastPivotHigh} FuturePivotHigh:{futurePivotHigh}");
+                    //_batchLog.Update(_logId, $"Missing PastPivotHigh:{pastPivotHigh} FuturePivotHigh:{futurePivotHigh}");
                     continue;
                 }
 

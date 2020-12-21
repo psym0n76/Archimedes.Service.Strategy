@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Domain;
+using Archimedes.Library.Message;
 using Archimedes.Library.Message.Dto;
 using Archimedes.Library.RabbitMq;
 using Archimedes.Service.Strategy.Http;
@@ -42,7 +43,7 @@ namespace Archimedes.Service.Strategy
             services.AddTransient<ICandleLoader, CandleLoader>();
             services.AddTransient<IStrategyConsumer>(x => new StrategyConsumer(config.RabbitHost, config.RabbitPort, config.RabbitExchange,"StrategyRequestQueue"));
 
-            services.AddTransient<IProducerFanout<PriceLevelDto>>(x => new ProducerFanout<PriceLevelDto>(config.RabbitHost, config.RabbitPort));
+            services.AddTransient<IProducerFanout<PriceLevelMessage>>(x => new ProducerFanout<PriceLevelMessage>(config.RabbitHost, config.RabbitPort));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

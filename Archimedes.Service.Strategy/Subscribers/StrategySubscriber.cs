@@ -24,13 +24,13 @@ namespace Archimedes.Service.Strategy
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
         private readonly IHubContext<StrategyHub> _context;
-        private readonly IProducerFanout<PriceLevelDto> _producerFanout;
+        private readonly IProducerFanout<PriceLevelMessage> _producerFanout;
         private readonly BatchLog _batchLog = new BatchLog();
         private string _logId;
 
         public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader,
             IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context,
-            IProducerFanout<PriceLevelDto> producerFanout)
+            IProducerFanout<PriceLevelMessage> producerFanout)
         {
             _logger = logger;
             _consumer = consumer;
@@ -93,7 +93,15 @@ namespace Archimedes.Service.Strategy
 
                     {
                         _batchLog.Update(_logId, $"Publish to ArchimedesPriceLevels");
-                        _producerFanout.PublishMessages(levels, "Archimedes_Price_Level");
+                        
+                        var priceLevelMessage = new PriceLevelMessage()
+                        {
+                            Market = strategy.Market,
+                            Strategy = strategy.Name,
+                            PriceLevels = levels
+                        };
+                        
+                        _producerFanout.PublishMessage(priceLevelMessage, "Archimedes_Price_Level");
 
                         _batchLog.Update(_logId, $"Post PriceLevels to Repo API");
                         _client.AddPriceLevel(levels);
