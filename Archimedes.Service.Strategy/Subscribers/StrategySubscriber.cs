@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Logger;
-using Archimedes.Library.Message.Dto;
 
 namespace Archimedes.Service.Strategy
 {
@@ -20,7 +19,7 @@ namespace Archimedes.Service.Strategy
     {
         private readonly ILogger<StrategySubscriber> _logger;
         private readonly IStrategyConsumer _consumer;
-        private readonly ICandleLoader _loader;
+        private readonly ICandleHistoryLoader _loader;
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
         private readonly IHubContext<StrategyHub> _context;
@@ -28,7 +27,7 @@ namespace Archimedes.Service.Strategy
         private readonly BatchLog _batchLog = new BatchLog();
         private string _logId;
 
-        public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleLoader loader,
+        public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer, ICandleHistoryLoader loader,
             IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context,
             IProducerFanout<PriceLevelMessage> producerFanout)
         {

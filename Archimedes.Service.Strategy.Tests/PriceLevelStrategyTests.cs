@@ -128,9 +128,9 @@ namespace Archimedes.Service.Strategy.Tests
             _candles = GetCandleLoader().Load(candleDto);
         }
 
-        private static ICandleLoader GetCandleLoader()
+        private static ICandleHistoryLoader GetCandleLoader()
         {
-            return new CandleLoader();
+            return new CandleHistoryLoader();
         }
 
         private static PriceLevelStrategy GetSubjectUnderTest()

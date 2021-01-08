@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Message.Dto;
-using Archimedes.Service.Strategy.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -64,9 +63,9 @@ namespace Archimedes.Service.Strategy.Tests
             _candles = GetCandleLoader().Load(candleDto);
         }
 
-        private static ICandleLoader GetCandleLoader()
+        private static ICandleHistoryLoader GetCandleLoader()
         {
-            return new CandleLoader();
+            return new CandleHistoryLoader();
         }
 
         private static PivotLevelStrategyHigh GetSubjectUnderTest()

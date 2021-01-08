@@ -40,7 +40,7 @@ namespace Archimedes.Service.Strategy
             services.AddTransient<IPivotLevelStrategyHigh, PivotLevelStrategyHigh>();
             services.AddTransient<IPivotLevelStrategyLow, PivotLevelStrategyLow>();
 
-            services.AddTransient<ICandleLoader, CandleLoader>();
+            services.AddTransient<ICandleHistoryLoader, CandleHistoryLoader>();
             services.AddTransient<IStrategyConsumer>(x => new StrategyConsumer(config.RabbitHost, config.RabbitPort, config.RabbitExchange,"StrategyRequestQueue"));
 
             services.AddTransient<IProducerFanout<PriceLevelMessage>>(x => new ProducerFanout<PriceLevelMessage>(config.RabbitHost, config.RabbitPort));
