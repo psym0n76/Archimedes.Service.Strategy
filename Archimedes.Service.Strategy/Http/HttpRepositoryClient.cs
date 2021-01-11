@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Archimedes.Library.Domain;
@@ -13,11 +11,12 @@ using Microsoft.Extensions.Options;
 namespace Archimedes.Service.Strategy.Http
 {
     public class HttpRepositoryClient : IHttpRepositoryClient
-    { 
+    {
         private readonly ILogger<HttpRepositoryClient> _logger;
         private readonly HttpClient _client;
 
-        public HttpRepositoryClient(IOptions<Config> config, HttpClient httpClient, ILogger<HttpRepositoryClient> logger)
+        public HttpRepositoryClient(IOptions<Config> config, HttpClient httpClient,
+            ILogger<HttpRepositoryClient> logger)
         {
             httpClient.BaseAddress = new Uri($"{config.Value.ApiRepositoryUrl}");
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -31,80 +30,94 @@ namespace Archimedes.Service.Strategy.Http
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError($"GET Failed: {response.ReasonPhrase} from {response.RequestMessage.RequestUri}");
-                return null;
+                var errorResponse = await response.Content.ReadAsAsync<string>();
+
+                if (response.RequestMessage != null)
+                    _logger.LogError(
+                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                return new List<CandleDto>();
             }
 
-            var candles = await response.Content.ReadAsAsync<IEnumerable<CandleDto>>();
-
-            return candles.ToList();
+            return await response.Content.ReadAsAsync<List<CandleDto>>();
         }
 
 
 
         public async Task<List<StrategyDto>> GetStrategiesByGranularityMarket(string market, string granularity)
         {
-            var response = await _client.GetAsync($"strategy/bymarket_bygranularity?market={market}&granularity={granularity}");
-
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError($"GET Failed: {response.ReasonPhrase} from {response.RequestMessage.RequestUri}");
-                return null;
-            }
-
-            var strategies = await response.Content.ReadAsAsync<IEnumerable<StrategyDto>>();
-
-            return strategies.ToList();
-        }
-
-        public async Task<List<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity)
-        {
-            var response = await _client.GetAsync($"candle/bymarket_bygranularity?market={market}&granularity={granularity}");
-
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError($"GET Failed: {response.ReasonPhrase} from {response.RequestMessage.RequestUri}");
-                return null;
-            }
-
-            var candles = await response.Content.ReadAsAsync<IEnumerable<CandleDto>>();
-
-            return candles.ToList();
-        }
-
-        public async Task<List<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity, DateTime startDate, DateTime endDate)
-        {
-            var response = await _client.GetAsync($"candle/bymarket_bygranularity_fromdate_todate?market={market}&granularity={granularity}&fromdate={startDate}&todate={endDate}");
+            var response =
+                await _client.GetAsync($"strategy/bymarket_bygranularity?market={market}&granularity={granularity}");
 
             if (!response.IsSuccessStatusCode)
             {
                 var errorResponse = await response.Content.ReadAsAsync<string>();
-                
+
                 if (response.RequestMessage != null)
                     _logger.LogError(
-                        $"GET Failed: {response.ReasonPhrase}  {errorResponse} from {response.RequestMessage.RequestUri}");
-                return null;
+                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                return new List<StrategyDto>();
             }
 
-            var candles = await response.Content.ReadAsAsync<IEnumerable<CandleDto>>();
-
-            return candles.ToList();
+            return await response.Content.ReadAsAsync<List<StrategyDto>>();
         }
 
-        public void AddPriceLevel(List<PriceLevelDto> priceLevel)
+        public async Task<List<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity)
+        {
+            var response =
+                await _client.GetAsync($"candle/bymarket_bygranularity?market={market}&granularity={granularity}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await response.Content.ReadAsAsync<string>();
+
+                if (response.RequestMessage != null)
+                    _logger.LogError(
+                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                return new List<CandleDto>();
+            }
+
+            return await response.Content.ReadAsAsync<List<CandleDto>>();
+        }
+
+        public async Task<List<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity,
+            DateTime startDate, DateTime endDate)
+        {
+            var response =
+                await _client.GetAsync(
+                    $"candle/bymarket_bygranularity_fromdate_todate?market={market}&granularity={granularity}&fromdate={startDate}&todate={endDate}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await response.Content.ReadAsAsync<string>();
+
+                if (response.RequestMessage != null)
+                    _logger.LogError(
+                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                return new List<CandleDto>();
+            }
+
+            return await response.Content.ReadAsAsync<List<CandleDto>>();
+        }
+
+        public async void AddPriceLevel(List<PriceLevelDto> priceLevel)
         {
             try
             {
                 var payload = new JsonContent(priceLevel);
-                var response =  _client.PostAsync("price-level", payload).Result; //post request wait to finish
+                var response = _client.PostAsync("price-level", payload).Result; //post request wait to finish
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError($"Failed to Post {response.ReasonPhrase} from {_client.BaseAddress}price-level");
+                    var errorResponse = await response.Content.ReadAsAsync<string>();
+
+                    if (response.RequestMessage != null)
+                        _logger.LogError(
+                            $"POST Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                    return;
                 }
 
                 _logger.LogInformation(
-                    $"ADDED PriceLevels {priceLevel} Price Levels\n");
+                    $"ADDED PriceLevels {priceLevel.Count} Price Level(s)\n");
             }
             catch (Exception e)
             {
@@ -121,11 +134,16 @@ namespace Archimedes.Service.Strategy.Http
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError($"Failed to Post {response.ReasonPhrase} from {_client.BaseAddress}strategy");
+                    var errorResponse = await response.Content.ReadAsAsync<string>();
+
+                    if (response.RequestMessage != null)
+                        _logger.LogError(
+                            $"PUT Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                    return;
                 }
 
                 _logger.LogInformation(
-                    $"UPDATED Strategy Statistics {strategy}\n");
+                    $"UPDATED Strategy Statistics {strategy.Name} {strategy.Market} {strategy.LastUpdated}\n");
             }
             catch (Exception e)
             {
