@@ -38,7 +38,6 @@ namespace Archimedes.Service.Strategy
                     continue;
                 }
 
-
                 _batchLog.Update(_logId, $"PivotHigh found: {candle.TimeFrame} {candle.TimeStamp}");
 
                 var p = new PriceLevelDto()
