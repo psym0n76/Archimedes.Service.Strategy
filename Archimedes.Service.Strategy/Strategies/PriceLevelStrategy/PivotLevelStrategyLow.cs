@@ -70,9 +70,9 @@ namespace Archimedes.Service.Strategy
             var pivot = false;
 
             //ensure we dont use the first or last candles
-            var candles = history.Take(pivotCount).ToList();
+            var candles = history.Take(pivotCount-1).ToList();
             
-            if (candles.Count() < pivotCount)
+            if (candles.Count() < pivotCount-1)
             {
                 return false;
             }

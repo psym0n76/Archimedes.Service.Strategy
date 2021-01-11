@@ -33,12 +33,12 @@ namespace Archimedes.Service.Strategy.Tests
         }
 
         [Test]
-        public void Should_Calculate_HighPivots_BasedOn_FivePivotStrategy_And_Return_Seven()
+        public void Should_Calculate_HighPivots_BasedOn_FivePivotStrategy_And_Return_Eight()
         {
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 5);
 
-            Assert.AreEqual(7, result.Count);
+            Assert.AreEqual(8, result.Count);
         }
 
         // [TestCase("2020-10-07T23:45:00")] ignore because not enough history

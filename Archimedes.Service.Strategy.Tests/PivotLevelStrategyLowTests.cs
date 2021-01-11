@@ -39,16 +39,16 @@ namespace Archimedes.Service.Strategy.Tests
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 7);
 
-            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual(4, result.Count);
         }
 
         [Test]
-        public void Should_Calculate_LowPivots_BasedOn_FivePivotStrategy_And_Return_Seven()
+        public void Should_Calculate_LowPivots_BasedOn_FivePivotStrategy_And_Return_Eight()
         {
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 5);
 
-            Assert.AreEqual(6, result.Count);
+            Assert.AreEqual(8, result.Count);
         }
 
 

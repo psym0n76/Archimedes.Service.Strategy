@@ -102,12 +102,12 @@ namespace Archimedes.Service.Strategy.Tests
 
 
         [Test]
-        public void Should_Load_Candles_And_CalculatePriceLevel_BasedOn_SevenPivotStrategy_And_Return_Seven_Candles()
+        public void Should_Load_Candles_And_CalculatePriceLevel_BasedOn_SevenPivotStrategy_And_Return_Nine_Candles()
         {
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 7);
 
-            Assert.AreEqual(7, result.Count);
+            Assert.AreEqual(9, result.Count);
         }
 
 
@@ -117,7 +117,7 @@ namespace Archimedes.Service.Strategy.Tests
             var subject = GetSubjectUnderTest();
             var result = subject.Calculate(_candles, 5);
 
-            Assert.AreEqual(13, result.Count);
+            Assert.AreEqual(16, result.Count);
         }
 
         private void LoadMockCandles()
