@@ -65,7 +65,7 @@ namespace Archimedes.Service.Strategy
 
                 if (!strategies.Any())
                 {
-                    _logger.LogInformation(_batchLog.Print(_logId, $"Strategies missing {strategies.Count}"));
+                    _logger.LogInformation(_batchLog.Print(_logId, $"Strategies missing for {message.Market} {message.Granularity}"));
                     return;
                 }
 
