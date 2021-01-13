@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Archimedes.Library.Domain;
@@ -109,13 +110,21 @@ namespace Archimedes.Service.Strategy.Http
                     var errorResponse = await response.Content.ReadAsAsync<string>();
 
                     if (response.RequestMessage != null)
+                    {
+                        if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
+                        {
+                            _logger.LogInformation(
+                                $"POST Failed: {response.RequestMessage}");
+                            return new PriceLevelDto();
+                        }
+
                         _logger.LogError(
                             $"POST Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
-                    return new PriceLevelDto();
+                        return new PriceLevelDto();
+                    }
                 }
 
-                _logger.LogInformation(
-                    $"ADDED PriceLevels");
+                _logger.LogInformation($"ADDED PriceLevels");
 
                 return await response.Content.ReadAsAsync<PriceLevelDto>();
 
