@@ -40,7 +40,7 @@ namespace Archimedes.Service.Strategy.Http
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
                 if (response.RequestMessage != null)
-                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                    _logger.LogError(_batchLog.Print(_logId, $"GET FAILED: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<CandleDto>();
             }
             
@@ -62,8 +62,15 @@ namespace Archimedes.Service.Strategy.Http
             {
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    if (response.RequestMessage != null)
+                        _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
+                    return new List<StrategyDto>();
+                }
+                
                 if (response.RequestMessage != null)
-                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                    _logger.LogError(_batchLog.Print(_logId, $"GET FAILED: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<StrategyDto>();
             }
 
@@ -84,8 +91,16 @@ namespace Archimedes.Service.Strategy.Http
             {
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    if (response.RequestMessage != null)
+                        _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
+                    return new List<CandleDto>();
+                }
+
+
                 if (response.RequestMessage != null)
-                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                    _logger.LogError(_batchLog.Print(_logId, $"GET FAILED: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<CandleDto>();
             }
 
@@ -109,8 +124,15 @@ namespace Archimedes.Service.Strategy.Http
             {
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    if (response.RequestMessage != null)
+                        _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
+                    return new List<CandleDto>();
+                }
+
                 if (response.RequestMessage != null)
-                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                    _logger.LogError(_batchLog.Print(_logId, $"GET FAILED: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<CandleDto>();
             }
 
@@ -137,11 +159,11 @@ namespace Archimedes.Service.Strategy.Http
                 {
                     if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
                     {
-                        _logger.LogInformation(_batchLog.Print(_logId, $"POST Failed Duplicate: {response.RequestMessage.RequestUri}"));
+                        _logger.LogInformation(_batchLog.Print(_logId, $"POST FAILED Duplicate: {response.RequestMessage.RequestUri}"));
                         return new PriceLevelDto(){Strategy = "Duplicate"};
                     }
 
-                    _logger.LogError(_batchLog.Print(_logId,$"POST Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                    _logger.LogError(_batchLog.Print(_logId,$"POST FAILED: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                     return new PriceLevelDto();
                 }
             }
@@ -166,7 +188,7 @@ namespace Archimedes.Service.Strategy.Http
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
                 if (response.RequestMessage != null)
-                    _logger.LogError(_batchLog.Print(_logId, $"PUT Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                    _logger.LogError(_batchLog.Print(_logId, $"PUT FAILED: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return;
             }
             
