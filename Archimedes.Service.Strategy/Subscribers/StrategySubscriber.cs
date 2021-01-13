@@ -98,7 +98,7 @@ namespace Archimedes.Service.Strategy
 
                     foreach (var level in levels)
                     {
-                        if (await UpdateTableAndPublishToQueue(level, strategy)) break;
+                        if (await AddTableAndPublishToQueue(level, strategy)) break;
                     }
                 }
 
@@ -110,15 +110,15 @@ namespace Archimedes.Service.Strategy
             }
         }
 
-        private async Task<bool> UpdateTableAndPublishToQueue(PriceLevelDto level, StrategyDto strategy)
+        private async Task<bool> AddTableAndPublishToQueue(PriceLevelDto level, StrategyDto strategy)
         {
             _batchLog.Update(_logId, $"ADD PriceLevel {level.Market} {level.BuySell} {level.TimeStamp} to Table");
 
             var levelDto = await _client.AddPriceLevel(level);
 
-            if (levelDto.Id == string.Empty)
+            if (levelDto.Strategy == "Duplicate")
             {
-                _batchLog.Update(_logId, $"ADD PriceLevel to Table FAILED");
+                _batchLog.Update(_logId, $"NOT ADDED Duplication");
                 return true;
             }
 

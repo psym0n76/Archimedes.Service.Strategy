@@ -138,7 +138,7 @@ namespace Archimedes.Service.Strategy.Http
                     if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
                     {
                         _logger.LogInformation(_batchLog.Print(_logId, $"POST Failed: {response.RequestMessage}"));
-                        return new PriceLevelDto();
+                        return new PriceLevelDto(){Strategy = "Duplicate"};
                     }
 
                     _logger.LogError(_batchLog.Print(_logId,$"POST Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
