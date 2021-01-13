@@ -41,8 +41,6 @@ namespace Archimedes.Service.Strategy.Http
             return await response.Content.ReadAsAsync<List<CandleDto>>();
         }
 
-
-
         public async Task<List<StrategyDto>> GetStrategiesByGranularityMarket(string market, string granularity)
         {
             var response =
@@ -99,7 +97,7 @@ namespace Archimedes.Service.Strategy.Http
             return await response.Content.ReadAsAsync<List<CandleDto>>();
         }
 
-        public async void AddPriceLevel(List<PriceLevelDto> priceLevel)
+        public async Task<PriceLevelDto> AddPriceLevel(PriceLevelDto priceLevel)
         {
             try
             {
@@ -113,15 +111,19 @@ namespace Archimedes.Service.Strategy.Http
                     if (response.RequestMessage != null)
                         _logger.LogError(
                             $"POST Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
-                    return;
+                    return new PriceLevelDto();
                 }
 
                 _logger.LogInformation(
-                    $"ADDED PriceLevels {priceLevel.Count} Price Level(s)\n");
+                    $"ADDED PriceLevels");
+
+                return await response.Content.ReadAsAsync<PriceLevelDto>();
+
             }
             catch (Exception e)
             {
                 _logger.LogError($"Error {e.Message} {e.StackTrace}");
+                return new PriceLevelDto();
             }
         }
 
