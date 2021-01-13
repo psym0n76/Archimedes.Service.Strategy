@@ -31,7 +31,7 @@ namespace Archimedes.Service.Strategy.Http
         public async Task<List<CandleDto>> GetCandles()
         {
             _logId = _batchLog.Start();
-            _batchLog.Update(_logId,"GET GetCandles");
+            _batchLog.Update(_logId,$"GET {nameof(GetCandles)}");
             
             var response = await _client.GetAsync("candle");
 
@@ -53,7 +53,7 @@ namespace Archimedes.Service.Strategy.Http
         public async Task<List<StrategyDto>> GetStrategiesByGranularityMarket(string market, string granularity)
         {
             _logId = _batchLog.Start();
-            _batchLog.Update(_logId, $"GET GetStrategiesByGranularityMarket {market} {granularity}");
+            _batchLog.Update(_logId, $"GET {nameof(GetStrategiesByGranularityMarket)} {market} {granularity}");
 
             var response =
                 await _client.GetAsync($"strategy/bymarket_bygranularity?market={market}&granularity={granularity}");
@@ -64,8 +64,7 @@ namespace Archimedes.Service.Strategy.Http
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    if (response.RequestMessage != null)
-                        _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
+                    _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
                     return new List<StrategyDto>();
                 }
                 
@@ -82,7 +81,7 @@ namespace Archimedes.Service.Strategy.Http
         public async Task<List<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity)
         {
             _logId = _batchLog.Start();
-            _batchLog.Update(_logId, $"GET GetCandlesByGranularityMarket {market} {granularity}");
+            _batchLog.Update(_logId, $"GET {nameof(GetCandlesByGranularityMarket)} {market} {granularity}");
 
             var response =
                 await _client.GetAsync($"candle/bymarket_bygranularity?market={market}&granularity={granularity}");
@@ -93,8 +92,7 @@ namespace Archimedes.Service.Strategy.Http
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    if (response.RequestMessage != null)
-                        _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
+                    _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
                     return new List<CandleDto>();
                 }
 
@@ -114,7 +112,7 @@ namespace Archimedes.Service.Strategy.Http
             DateTime startDate, DateTime endDate)
         {
             _logId = _batchLog.Start();
-            _batchLog.Update(_logId, $"GET GetCandlesByGranularityMarketByDate {market} {granularity}");
+            _batchLog.Update(_logId, $"GET {nameof(GetCandlesByGranularityMarketByDate)} {market} {granularity}");
             
             var response =
                 await _client.GetAsync(
@@ -126,8 +124,7 @@ namespace Archimedes.Service.Strategy.Http
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    if (response.RequestMessage != null)
-                        _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
+                    _logger.LogWarning(_batchLog.Print(_logId, $"GET FAILED: {errorResponse}"));
                     return new List<CandleDto>();
                 }
 
@@ -146,7 +143,7 @@ namespace Archimedes.Service.Strategy.Http
         {
             _logId = _batchLog.Start();
             _batchLog.Update(_logId,
-                $"POST AddPriceLevel {priceLevel.BuySell} {priceLevel.Market} {priceLevel.TimeStamp}");
+                $"POST {nameof(AddPriceLevel)} {priceLevel.BuySell} {priceLevel.Market} {priceLevel.TimeStamp}");
 
             var payload = new JsonContent(priceLevel);
             var response = _client.PostAsync("price-level", payload).Result; //post request wait to finish
@@ -178,7 +175,7 @@ namespace Archimedes.Service.Strategy.Http
         {
             _logId = _batchLog.Start();
             _batchLog.Update(_logId,
-                $"PUT UpdateStrategyMetrics {strategy.Name} {strategy.Market} {strategy.Granularity}");
+                $"PUT {nameof(UpdateStrategyMetrics)} {strategy.Name} {strategy.Market} {strategy.Granularity}");
 
             var payload = new JsonContent(strategy);
             var response = await _client.PutAsync("strategy", payload);
