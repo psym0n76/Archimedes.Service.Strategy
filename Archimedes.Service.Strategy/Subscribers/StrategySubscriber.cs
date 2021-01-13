@@ -112,7 +112,7 @@ namespace Archimedes.Service.Strategy
 
         private async Task<bool> UpdateTableAndPublishToQueue(PriceLevelDto level, StrategyDto strategy)
         {
-            _batchLog.Update(_logId, $"ADD PriceLevel to Table");
+            _batchLog.Update(_logId, $"ADD PriceLevel  {level.BuySell} {level.TimeStamp} to Table");
 
             var levelDto = await _client.AddPriceLevel(level);
 
@@ -121,6 +121,8 @@ namespace Archimedes.Service.Strategy
                 _batchLog.Update(_logId, $"PriceLevel.Id {levelDto.Id} returned from Table");
                 return true;
             }
+
+            _batchLog.Update(_logId, $"ADDED PriceLevel.Id {levelDto.Id} returned from Table");
 
             PublishToQueue(strategy, levelDto);
 
