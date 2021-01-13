@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Archimedes.Library.Domain;
 using Archimedes.Library.Extensions;
+using Archimedes.Library.Logger;
 using Archimedes.Library.Message.Dto;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,8 @@ namespace Archimedes.Service.Strategy.Http
     {
         private readonly ILogger<HttpRepositoryClient> _logger;
         private readonly HttpClient _client;
+        private readonly BatchLog _batchLog = new();
+        private string _logId;
 
         public HttpRepositoryClient(IOptions<Config> config, HttpClient httpClient,
             ILogger<HttpRepositoryClient> logger)
@@ -27,6 +30,9 @@ namespace Archimedes.Service.Strategy.Http
 
         public async Task<List<CandleDto>> GetCandles()
         {
+            _logId = _batchLog.Start();
+            _batchLog.Update(_logId,"GET GetCandles");
+            
             var response = await _client.GetAsync("candle");
 
             if (!response.IsSuccessStatusCode)
@@ -34,16 +40,21 @@ namespace Archimedes.Service.Strategy.Http
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
                 if (response.RequestMessage != null)
-                    _logger.LogError(
-                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<CandleDto>();
             }
-
-            return await response.Content.ReadAsAsync<List<CandleDto>>();
+            
+            var candles = await response.Content.ReadAsAsync<List<CandleDto>>();
+            
+            _logger.LogInformation(_batchLog.Print(_logId,$"Returned {candles.Count} Candle(s)"));
+            return candles;
         }
 
         public async Task<List<StrategyDto>> GetStrategiesByGranularityMarket(string market, string granularity)
         {
+            _logId = _batchLog.Start();
+            _batchLog.Update(_logId, $"GET GetStrategiesByGranularityMarket {market} {granularity}");
+
             var response =
                 await _client.GetAsync($"strategy/bymarket_bygranularity?market={market}&granularity={granularity}");
 
@@ -52,16 +63,20 @@ namespace Archimedes.Service.Strategy.Http
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
                 if (response.RequestMessage != null)
-                    _logger.LogError(
-                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<StrategyDto>();
             }
 
-            return await response.Content.ReadAsAsync<List<StrategyDto>>();
+            var strategies =  await response.Content.ReadAsAsync<List<StrategyDto>>();
+            _logger.LogInformation(_batchLog.Print(_logId, $"Returned {strategies.Count} Strategies"));
+            return strategies;
         }
 
         public async Task<List<CandleDto>> GetCandlesByGranularityMarket(string market, string granularity)
         {
+            _logId = _batchLog.Start();
+            _batchLog.Update(_logId, $"GET GetCandlesByGranularityMarket {market} {granularity}");
+
             var response =
                 await _client.GetAsync($"candle/bymarket_bygranularity?market={market}&granularity={granularity}");
 
@@ -70,17 +85,22 @@ namespace Archimedes.Service.Strategy.Http
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
                 if (response.RequestMessage != null)
-                    _logger.LogError(
-                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<CandleDto>();
             }
 
-            return await response.Content.ReadAsAsync<List<CandleDto>>();
+            var candles = await response.Content.ReadAsAsync<List<CandleDto>>();
+
+            _logger.LogInformation(_batchLog.Print(_logId, $"Returned {candles.Count} Candle(s)"));
+            return candles;
         }
 
         public async Task<List<CandleDto>> GetCandlesByGranularityMarketByDate(string market, string granularity,
             DateTime startDate, DateTime endDate)
         {
+            _logId = _batchLog.Start();
+            _batchLog.Update(_logId, $"GET GetCandlesByGranularityMarketByDate {market} {granularity}");
+            
             var response =
                 await _client.GetAsync(
                     $"candle/bymarket_bygranularity_fromdate_todate?market={market}&granularity={granularity}&fromdate={startDate}&todate={endDate}");
@@ -90,76 +110,67 @@ namespace Archimedes.Service.Strategy.Http
                 var errorResponse = await response.Content.ReadAsAsync<string>();
 
                 if (response.RequestMessage != null)
-                    _logger.LogError(
-                        $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                    _logger.LogError(_batchLog.Print(_logId, $"GET Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
                 return new List<CandleDto>();
             }
 
-            return await response.Content.ReadAsAsync<List<CandleDto>>();
+            var candles = await response.Content.ReadAsAsync<List<CandleDto>>();
+
+            _logger.LogInformation(_batchLog.Print(_logId, $"Returned {candles.Count} Candle(s)"));
+            return candles;
         }
 
         public async Task<PriceLevelDto> AddPriceLevel(PriceLevelDto priceLevel)
         {
-            try
+            _logId = _batchLog.Start();
+            _batchLog.Update(_logId,
+                $"POST AddPriceLevel {priceLevel.BuySell} {priceLevel.Market} {priceLevel.TimeStamp}");
+
+            var payload = new JsonContent(priceLevel);
+            var response = _client.PostAsync("price-level", payload).Result; //post request wait to finish
+
+            if (!response.IsSuccessStatusCode)
             {
-                var payload = new JsonContent(priceLevel);
-                var response = _client.PostAsync("price-level", payload).Result; //post request wait to finish
+                var errorResponse = await response.Content.ReadAsAsync<string>();
 
-                if (!response.IsSuccessStatusCode)
+                if (response.RequestMessage != null)
                 {
-                    var errorResponse = await response.Content.ReadAsAsync<string>();
-
-                    if (response.RequestMessage != null)
+                    if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
                     {
-                        if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
-                        {
-                            _logger.LogInformation(
-                                $"POST Failed: {response.RequestMessage}");
-                            return new PriceLevelDto();
-                        }
-
-                        _logger.LogError(
-                            $"POST Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
+                        _logger.LogInformation(_batchLog.Print(_logId, $"POST Failed: {response.RequestMessage}"));
                         return new PriceLevelDto();
                     }
+
+                    _logger.LogError(_batchLog.Print(_logId,$"POST Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                    return new PriceLevelDto();
                 }
-
-                _logger.LogInformation($"ADDED PriceLevels");
-
-                return await response.Content.ReadAsAsync<PriceLevelDto>();
-
             }
-            catch (Exception e)
-            {
-                _logger.LogError($"Error {e.Message} {e.StackTrace}");
-                return new PriceLevelDto();
-            }
+            
+            var level = await response.Content.ReadAsAsync<PriceLevelDto>();
+
+            _logger.LogInformation(_batchLog.Print(_logId, $"ADDED PriceLevel ID={level.Id}"));
+            return level;
         }
 
         public async void UpdateStrategyMetrics(StrategyDto strategy)
         {
-            try
+            _logId = _batchLog.Start();
+            _batchLog.Update(_logId,
+                $"PUT UpdateStrategyMetrics {strategy.Name} {strategy.Market} {strategy.Granularity}");
+
+            var payload = new JsonContent(strategy);
+            var response = await _client.PutAsync("strategy", payload);
+
+            if (!response.IsSuccessStatusCode)
             {
-                var payload = new JsonContent(strategy);
-                var response = await _client.PutAsync("strategy", payload);
+                var errorResponse = await response.Content.ReadAsAsync<string>();
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorResponse = await response.Content.ReadAsAsync<string>();
-
-                    if (response.RequestMessage != null)
-                        _logger.LogError(
-                            $"PUT Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}");
-                    return;
-                }
-
-                _logger.LogInformation(
-                    $"UPDATED Strategy Statistics {strategy.Name} {strategy.Market} {strategy.LastUpdated}\n");
+                if (response.RequestMessage != null)
+                    _logger.LogError(_batchLog.Print(_logId, $"PUT Failed: {response.ReasonPhrase}  \n\n{errorResponse} \n\n{response.RequestMessage.RequestUri}"));
+                return;
             }
-            catch (Exception e)
-            {
-                _logger.LogError($"Error {e.Message} {e.StackTrace}");
-            }
+            
+            _logger.LogInformation(_batchLog.Print(_logId, $"UPDATED Strategy Statistics {strategy.Name} {strategy.Market} {strategy.LastUpdated}"));
         }
     }
 }

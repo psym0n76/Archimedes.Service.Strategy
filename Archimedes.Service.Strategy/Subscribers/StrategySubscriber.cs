@@ -112,17 +112,17 @@ namespace Archimedes.Service.Strategy
 
         private async Task<bool> UpdateTableAndPublishToQueue(PriceLevelDto level, StrategyDto strategy)
         {
-            _batchLog.Update(_logId, $"ADD PriceLevel  {level.BuySell} {level.TimeStamp} to Table");
+            _batchLog.Update(_logId, $"ADD PriceLevel {level.Market} {level.BuySell} {level.TimeStamp} to Table");
 
             var levelDto = await _client.AddPriceLevel(level);
 
             if (levelDto.Id == string.Empty)
             {
-                _batchLog.Update(_logId, $"PriceLevel.Id {levelDto.Id} returned from Table");
+                _batchLog.Update(_logId, $"ADD PriceLevel to Table FAILED");
                 return true;
             }
 
-            _batchLog.Update(_logId, $"ADDED PriceLevel.Id {levelDto.Id} returned from Table");
+            _batchLog.Update(_logId, $"ADDED Id={levelDto.Id} to Table");
 
             PublishToQueue(strategy, levelDto);
 
@@ -149,7 +149,7 @@ namespace Archimedes.Service.Strategy
             strategy.EndDate = level.TimeStamp;
             strategy.LastUpdated = DateTime.Now;
 
-            _batchLog.Update(_logId, $"Update StrategyMetrics to Repo API");
+            _batchLog.Update(_logId, $"Update StrategyMetrics to Table");
             _client.UpdateStrategyMetrics(strategy);
 
             _batchLog.Update(_logId, $"Publish StrategyMetrics to Hub");
