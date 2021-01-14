@@ -101,7 +101,7 @@ namespace Archimedes.Service.Strategy
 
                     foreach (var level in levels)
                     {
-                        if (await AddTableAndPublishToQueue(level, strategy)) break;
+                        await AddTableAndPublishToQueue(level, strategy);
                     }
                 }
 
@@ -113,7 +113,7 @@ namespace Archimedes.Service.Strategy
             }
         }
 
-        private async Task<bool> AddTableAndPublishToQueue(PriceLevelDto level, StrategyDto strategy)
+        private async Task AddTableAndPublishToQueue(PriceLevelDto level, StrategyDto strategy)
         {
             _batchLog.Update(_logId, $"ADD PriceLevel {level.Market} {level.BuySell} {level.TimeStamp} to Table");
 
@@ -122,7 +122,7 @@ namespace Archimedes.Service.Strategy
             if (levelDto.Strategy == "Duplicate")
             {
                 _batchLog.Update(_logId, $"NOT ADDED Duplication");
-                return true;
+                return;
             }
 
             _batchLog.Update(_logId, $"ADDED Id={levelDto.Id} to Table");
@@ -131,7 +131,6 @@ namespace Archimedes.Service.Strategy
             PublishToHub(levelDto);
 
             await UpdateStrategyMetrics(strategy, level);
-            return false;
         }
 
         private void PublishToHub(PriceLevelDto level)
@@ -171,16 +170,10 @@ namespace Archimedes.Service.Strategy
             var marketCandles = await _client.GetCandlesByGranularityMarketByDate(message.Market, message.Granularity,
                 endDate.AddDays(-1), DateTime.Now);
 
-            if (marketCandles == null)
-            {
-                _batchLog.Update(_logId, $"No Candles in CandleLoader");
-                return null;
-            }
-
             if (!marketCandles.Any())
             {
                 _batchLog.Update(_logId, $"No Candles in CandleLoader");
-                return null;
+                return new List<Candle>();
             }
 
             _batchLog.Update(_logId,

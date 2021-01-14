@@ -28,14 +28,12 @@ namespace Archimedes.Service.Strategy
 
         public List<PriceLevelDto> Calculate(List<Candle> candles, int pivotCount)
         {
-            _logId = _batchLog.Start();
+            _logId = _batchLog.Start("Pivot Level Strategy");
             
-            _batchLog.Update(_logId,"Pivot Level Strategy");
-            
-            if (candles == null)
+            if (!candles.Any())
             {
-                _batchLog.Print(_logId, "Candle Collection empty");
-                return null;
+                _batchLog.Print(_logId, "Candles empty");
+                return new List<PriceLevelDto>();
             }
 
             var market = candles.First().Market;
