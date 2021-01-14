@@ -33,6 +33,7 @@ namespace Archimedes.Service.Strategy
             services.Configure<Config>(Configuration.GetSection("AppSettings"));
 
             services.AddTransient<IStrategySubscriber, StrategySubscriber>();
+            services.AddTransient<IStrategyPublisher, StrategyPublisher>();
             services.AddTransient<IPriceLevelStrategy, PriceLevelStrategy>();
 
             services.AddTransient<IPivotLevelStrategyHigh, PivotLevelStrategyHigh>();

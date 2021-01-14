@@ -1,8 +1,6 @@
 ﻿using Archimedes.Library.Message;
 using Archimedes.Library.RabbitMq;
 using Archimedes.Service.Strategy.Http;
-using Archimedes.Service.Strategy.Hubs;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -12,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Logger;
-using Archimedes.Library.Message.Dto;
 
 namespace Archimedes.Service.Strategy
 {
@@ -23,26 +20,21 @@ namespace Archimedes.Service.Strategy
         private readonly ICandleHistoryLoader _loader;
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
-        private readonly IHubContext<StrategyHub> _strategyHub;
-        private readonly IHubContext<PriceLevelHub> _priceLevelHub;
-        
-        private readonly IProducerFanout<PriceLevelMessage> _producerFanout;
+        private readonly IStrategyPublisher _publisher;
+
         private readonly BatchLog _batchLog = new();
         private string _logId;
 
         public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer,
             ICandleHistoryLoader loader,
-            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> strategyHub,
-            IProducerFanout<PriceLevelMessage> producerFanout, IHubContext<PriceLevelHub> priceLevelHub)
+            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IStrategyPublisher publisher)
         {
             _logger = logger;
             _consumer = consumer;
             _loader = loader;
             _priceLevelStrategy = priceLevelStrategy;
             _client = client;
-            _strategyHub = strategyHub;
-            _producerFanout = producerFanout;
-            _priceLevelHub = priceLevelHub;
+            _publisher = publisher;
             _consumer.HandleMessage += Consumer_HandleMessage;
         }
 
@@ -53,7 +45,7 @@ namespace Archimedes.Service.Strategy
 
         private void Consumer_HandleMessage(object sender, MessageHandlerEventArgs args)
         {
-            _logId = _batchLog.Start();
+            _logId = _batchLog.Start(nameof(Consumer_HandleMessage));
             var message = JsonConvert.DeserializeObject<StrategyMessage>(args.Message);
 
             _batchLog.Update(_logId, "Request from StrategyResponseQueue");
@@ -101,7 +93,7 @@ namespace Archimedes.Service.Strategy
 
                     foreach (var level in levels)
                     {
-                        await AddTableAndPublishToQueue(level, strategy);
+                        await _publisher.AddTableAndPublishToQueue(level, strategy);
                     }
                 }
 
@@ -113,57 +105,6 @@ namespace Archimedes.Service.Strategy
             }
         }
 
-        private async Task AddTableAndPublishToQueue(PriceLevelDto level, StrategyDto strategy)
-        {
-            _batchLog.Update(_logId, $"ADD PriceLevel {level.Market} {level.BuySell} {level.TimeStamp} to Table");
-
-            var levelDto = await _client.AddPriceLevel(level);
-
-            if (levelDto.Strategy == "Duplicate")
-            {
-                _batchLog.Update(_logId, $"NOT ADDED Duplication");
-                return;
-            }
-
-            _batchLog.Update(_logId, $"ADDED Id={levelDto.Id} to Table");
-
-            PublishToQueue(strategy, levelDto);
-            PublishToHub(levelDto);
-
-            await UpdateStrategyMetrics(strategy, level);
-        }
-
-        private void PublishToHub(PriceLevelDto level)
-        {
-            _batchLog.Update(_logId,$"Publish PriceLevel to Hub {level.Granularity} {level.TimeStamp}");
-            _priceLevelHub.Clients.All.SendAsync("Update", level);
-        }
-
-        private void PublishToQueue(StrategyDto strategy, PriceLevelDto level)
-        {
-            var levelMessage = new PriceLevelMessage
-            {
-                Market = strategy.Market,
-                Strategy = strategy.Name,
-                Granularity = strategy.Granularity,
-                PriceLevels = new List<PriceLevelDto>() {level}
-            };
-
-            _batchLog.Update(_logId, $"Publish to ArchimedesPriceLevels");
-            _producerFanout.PublishMessage(levelMessage, "Archimedes_Price_Level");
-        }
-
-        private async Task UpdateStrategyMetrics(StrategyDto strategy, PriceLevelDto level)
-        {
-            strategy.EndDate = level.TimeStamp;
-            strategy.LastUpdated = DateTime.Now;
-
-            _batchLog.Update(_logId, $"Update StrategyMetrics to Table");
-            _client.UpdateStrategyMetrics(strategy);
-
-            _batchLog.Update(_logId, $"Publish StrategyMetrics to Hub");
-            await _strategyHub.Clients.All.SendAsync("Update", strategy);
-        }
 
         private async Task<List<Candle>> LoadCandles(StrategyMessage message, DateTime endDate)
         {
