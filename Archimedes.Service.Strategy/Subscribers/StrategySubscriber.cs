@@ -23,23 +23,26 @@ namespace Archimedes.Service.Strategy
         private readonly ICandleHistoryLoader _loader;
         private readonly IPriceLevelStrategy _priceLevelStrategy;
         private readonly IHttpRepositoryClient _client;
-        private readonly IHubContext<StrategyHub> _context;
+        private readonly IHubContext<StrategyHub> _strategyHub;
+        private readonly IHubContext<PriceLevelHub> _priceLevelHub;
+        
         private readonly IProducerFanout<PriceLevelMessage> _producerFanout;
         private readonly BatchLog _batchLog = new();
         private string _logId;
 
         public StrategySubscriber(ILogger<StrategySubscriber> logger, IStrategyConsumer consumer,
             ICandleHistoryLoader loader,
-            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> context,
-            IProducerFanout<PriceLevelMessage> producerFanout)
+            IPriceLevelStrategy priceLevelStrategy, IHttpRepositoryClient client, IHubContext<StrategyHub> strategyHub,
+            IProducerFanout<PriceLevelMessage> producerFanout, IHubContext<PriceLevelHub> priceLevelHub)
         {
             _logger = logger;
             _consumer = consumer;
             _loader = loader;
             _priceLevelStrategy = priceLevelStrategy;
             _client = client;
-            _context = context;
+            _strategyHub = strategyHub;
             _producerFanout = producerFanout;
+            _priceLevelHub = priceLevelHub;
             _consumer.HandleMessage += Consumer_HandleMessage;
         }
 
@@ -125,9 +128,16 @@ namespace Archimedes.Service.Strategy
             _batchLog.Update(_logId, $"ADDED Id={levelDto.Id} to Table");
 
             PublishToQueue(strategy, levelDto);
+            PublishToHub(levelDto);
 
             await UpdateStrategyMetrics(strategy, level);
             return false;
+        }
+
+        private void PublishToHub(PriceLevelDto level)
+        {
+            _batchLog.Update(_logId,$"Publish PriceLevel to Hub {level.Granularity} {level.TimeStamp}");
+            _priceLevelHub.Clients.All.SendAsync("Update", level);
         }
 
         private void PublishToQueue(StrategyDto strategy, PriceLevelDto level)
@@ -153,7 +163,7 @@ namespace Archimedes.Service.Strategy
             _client.UpdateStrategyMetrics(strategy);
 
             _batchLog.Update(_logId, $"Publish StrategyMetrics to Hub");
-            await _context.Clients.All.SendAsync("Update", strategy);
+            await _strategyHub.Clients.All.SendAsync("Update", strategy);
         }
 
         private async Task<List<Candle>> LoadCandles(StrategyMessage message, DateTime endDate)

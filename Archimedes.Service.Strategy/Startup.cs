@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using Archimedes.Library.Candles;
 using Archimedes.Library.Domain;
 using Archimedes.Library.Message;
-using Archimedes.Library.Message.Dto;
 using Archimedes.Library.RabbitMq;
 using Archimedes.Service.Strategy.Http;
 using Archimedes.Service.Strategy.Hubs;
@@ -64,6 +62,7 @@ namespace Archimedes.Service.Strategy
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<StrategyHub>("/hubs/strategy");
+                endpoints.MapHub<PriceLevelHub>("/hubs/price-level");
             });
         }
     }
